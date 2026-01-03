@@ -1,11 +1,9 @@
+;'use client '
 import React from 'react'
-import Home from './component/Home.jsx' 
 
 const HomePage = () => {
   return (
-    <div>
-      <Home/>
-    </div>
+    <div>HomePage</div>
   )
 }
 
