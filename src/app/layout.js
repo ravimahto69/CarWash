@@ -1,6 +1,9 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import "antd/dist/reset.css"; // ✅ required for Ant Design
+import Layout from "antd/es/layout/layout";
+import Header from "./component/Header";
+import Footer from "./component/Footer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,9 +28,17 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <h1>Header</h1>
-        {children}
-        <h1>Footer</h1>
+      <header>
+        <Header/>
+      </header>
+        <Layout>
+          {children}
+        </Layout>
+        <footer>
+          <Footer/>
+        </footer>
+        
+        
       </body>
     </html>
   );

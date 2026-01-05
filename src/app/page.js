@@ -3,7 +3,7 @@ import Home from './component/Home.jsx'
 
 const HomePage = () => {
   return (
-    <div>
+    <div className='bg-gray-100'>
       <Home/>
     </div>
   )

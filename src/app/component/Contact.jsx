@@ -1,0 +1,85 @@
+'use client'
+import { Form, Input, Button, message } from "antd";
+
+const { TextArea } = Input;
+
+export default function ContactUs() {
+  const [form] = Form.useForm();
+
+  const handleSubmit = (values) => {
+    console.log(values);
+
+    message.success("Your message has been sent!");
+
+    //  RESET FORM
+    form.resetFields();
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg grid md:grid-cols-2">
+        
+        {/* Left Section */}
+        <div className="bg-blue-600 text-white p-8 rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+          <h2 className="text-3xl font-bold mb-4">Contact Us</h2>
+          <p className="text-blue-100 mb-6">
+            Have questions or feedback? We’d love to hear from you.
+          </p>
+
+          <div className="space-y-4 text-sm">
+            <p>📍 Bhopal Mp India</p>
+            <p>📞 +91 8709472551</p>
+            <p>✉️ washHubsupport@gmail.com</p>
+          </div>
+        </div>
+
+        {/* Right Section */}
+        <div className="p-8">
+          <Form
+            form={form}
+            layout="vertical" 
+            onFinish={handleSubmit} 
+            className="space-y-2"
+          >
+            <Form.Item
+              label="Full Name"
+              name="name"
+              rules={[{ required: true, message: "Please enter your name" }]}
+            >
+              <Input placeholder="John Doe" />
+            </Form.Item>
+
+            <Form.Item
+              label="Email Address"
+              name="email"
+              rules={[
+                { required: true, message: "Please enter your email" },
+                { type: "email", message: "Enter a valid email" },
+              ]}
+            >
+              <Input placeholder="john@example.com" />
+            </Form.Item>
+
+            <Form.Item
+              label="Message"
+              name="message"
+              rules={[{ required: true, message: "Please enter your message" }]}
+            >
+              <TextArea rows={4} placeholder="How can we help you?" />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                Send Message
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      </div>
+    </div>
+  );
+}
