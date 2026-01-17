@@ -7,7 +7,7 @@ const Footer = () => {
         {/* Brand */}
         <div>
           <h2 className="text-2xl font-bold text-white mb-2">
-            CarWash Pro 🚘
+            WashHub 
           </h2>
           <p className="text-sm text-gray-400">
             Professional car wash services delivered at your doorstep.
@@ -62,7 +62,7 @@ const Footer = () => {
 
       {/* Bottom Bar */}
       <div className="border-t border-gray-800 py-4 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} CarWash Pro. All rights reserved.
+        © {new Date().getFullYear()} WashHub. All rights reserved.
       </div>
     </footer>
   )

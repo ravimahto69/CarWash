@@ -22,24 +22,40 @@ const BookingPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));    
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Booking Submitted:", formData);
+    try {
+      const res = await fetch('/api/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    setFormData({
-      name: "",
-      phone: "",
-      email: "",
-      brand: "",
-      model: "",
-      vehicleType: "",
-      service: "",
-      date: "",
-      time: "",
-      location: "",
-      notes: "",
-    });
-    alert("Your booking has been confirmed!");
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        const msg = data?.error || 'Failed to submit booking';
+        alert(msg);
+        return;
+      }
+
+      alert('Your booking has been confirmed!');
+      setFormData({
+        name: '',
+        phone: '',
+        email: '',
+        brand: '',
+        model: '',
+        vehicleType: '',
+        service: '',
+        date: '',
+        time: '',
+        location: '',
+        notes: '',
+      });
+    } catch (error) {
+      console.error('Booking submit error:', error);
+      alert('An unexpected error occurred. Please try again.');
+    }
   };
 
   return (
@@ -124,6 +140,7 @@ const BookingPage = () => {
             <option>SUV</option>
             <option>Hatchback</option>
             <option>Truck</option>
+            <option>Bus</option>
           </select>
         </section>
 
@@ -146,29 +163,10 @@ const BookingPage = () => {
             <option>Deluxe Wash – 1000</option>
           </select>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <input
-              type="date"
-              name="date"
-              required
-              className="input"
-              value={formData.date}
-              onChange={handleChange}
-            />
-            <input
-              type="time"
-              name="time"
-              required
-              className="input"
-              value={formData.time}
-              onChange={handleChange}
-            />
-          </div>
-
           <input
             type="text"
             name="location"
-            placeholder="Service Location"
+            placeholder="Enter Your Location"
             className="input mt-4"
             value={formData.location}
             onChange={handleChange}
@@ -192,8 +190,6 @@ const BookingPage = () => {
           Confirm Booking
         </button>
       </form>
-
-      {/* Tailwind reusable input style */}
       <style>
         {`
           .input {

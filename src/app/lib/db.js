@@ -2,27 +2,25 @@ import mongoose from 'mongoose'
 
 const MONGO_URL = process.env.MONGO_DB_URL
 
-if(!MONGO_URL){
-    throw new Error("Please check the database enviroment variable")
+if (!MONGO_URL) {
+    throw new Error('Please set the MONGO_DB_URL environment variable')
 }
+
 let cached = global.mongoose
 
-if(!chached){
-    cached = mongoose.connect(MONGO_URL)
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null }
 }
 
-export async function dbConnection(){
-    if(cached.conn) return cached.conn
+export async function dbConnection() {
+    if (cached.conn) return cached.conn
 
-    if(!cached.promise){
-        cached.promise = mongoose.connect(MONGO_URL,{
-            bufferCommands:false,
-        }).then((mongoose)=>{
-            console.log("connected to database");
-            
-            return mongoose
+    if (!cached.promise) {
+        cached.promise = mongoose.connect(MONGO_URL, {
+            bufferCommands: false,
         })
     }
+
     cached.conn = await cached.promise
     return cached.conn
 }

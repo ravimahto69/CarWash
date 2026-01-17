@@ -34,7 +34,7 @@ const Home = () => {
       {/* ---------- HERO SECTION ---------- */}
       <div className="text-center mb-20">
         <Title level={1}>
-          Premium Car Wash at Your Doorstep 🚗
+          Premium Car Wash at Your Doorstep 
         </Title>
         <Paragraph className="text-gray-500 text-lg">
           Book professional car wash services in minutes
@@ -80,7 +80,7 @@ const Home = () => {
       {/* ---------- CTA SECTION ---------- */}
       <div className="mt-20 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl text-white text-center py-16 px-6">
         <Title level={2} className="!text-white">
-          Ready to Shine Your Car? ✨
+          Ready to Shine Your Car? 
         </Title>
         <Paragraph className="text-gray-200 text-lg">
           Schedule a car wash today and experience professional care.

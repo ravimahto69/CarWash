@@ -2,18 +2,22 @@
 
 import { Button, Form, Input, Typography } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
+import {  useRouter } from 'next/navigation';
+
 
 const { Title, Text } = Typography;
+export default function RegisterForm({children}) {
 
-export default function RegisterForm() {
-  const [form] = Form.useForm(); // ✅ AntD form instance
-
+ 
+  const [form] = Form.useForm(); 
+    const router = useRouter()
   const onFinish = (values) => {
     console.log('Register Data:', values);
-
-    //  Reset form after successful submit
     form.resetFields();
+  
+    router.push("/login")
   };
+
 
   return (
     <div className="w-full max-w-md rounded-2xl bg-white/90 backdrop-blur-md p-8 shadow-2xl">
@@ -25,9 +29,9 @@ export default function RegisterForm() {
       </Text>
 
       <Form
-        form={form}              //  attach form instance
+        form={form}             
         layout="vertical"
-        onFinish={onFinish}      //  controlled submit
+        onFinish={onFinish}      
       >
         <Form.Item
           label="Full Name"
