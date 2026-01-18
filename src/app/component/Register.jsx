@@ -1,9 +1,8 @@
 'use client';
 
-import { Button, Form, Input, Typography } from 'antd';
+import { Button, Form, Input, Typography, message } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
-import {  useRouter } from 'next/navigation';
-
+import { useRouter } from 'next/navigation';
 
 const { Title, Text } = Typography;
 export default function RegisterForm({children}) {
@@ -24,20 +23,22 @@ export default function RegisterForm({children}) {
       const data = await res.json()
 
       if (!res.ok || !data?.success) {
-        // Show error message from API
+        // Show error popup
         const errorMsg = data?.error || 'Registration failed'
-        console.error('Registration error:', errorMsg)
+        message.error(errorMsg)
         return // Don't proceed if registration failed
       }
 
-      // Show success message
-      console.log('Registration successful:', data.userId)
+      // Show success popup
+      message.success('Registration successful!')
 
       // Reset form and redirect to login
       form.resetFields()
-      router.push('/login')
+      setTimeout(() => {
+        router.push('/login')
+      }, 1500) // Wait for popup to show
     } catch (err) {
-      console.error('Register submit error:', err)
+      message.error('Something went wrong. Please try again.')
     }
   };
 

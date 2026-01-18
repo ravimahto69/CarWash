@@ -1,6 +1,7 @@
 "use client"
 
-import { Card, Row, Col, Typography, Button } from "antd"
+import { useEffect, useState } from "react"
+import { Card, Row, Col, Typography, Button, Spin, Alert } from "antd"
 import {
   CarOutlined,
   ThunderboltOutlined,
@@ -29,6 +30,29 @@ const services = [
 ]
 
 const Home = () => {
+  const [stores, setStores] = useState([])
+  const [loadingStores, setLoadingStores] = useState(true)
+  const [storeError, setStoreError] = useState("")
+
+  useEffect(() => {
+    const loadStores = async () => {
+      try {
+        const res = await fetch("/api/stores")
+        const data = await res.json()
+        if (!res.ok || !data?.success) {
+          throw new Error(data?.error || "Failed to load stores")
+        }
+        setStores(data.data || [])
+      } catch (err) {
+        setStoreError(err.message || "Failed to load stores")
+      } finally {
+        setLoadingStores(false)
+      }
+    }
+
+    loadStores()
+  }, [])
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
       {/* ---------- HERO SECTION ---------- */}
@@ -94,6 +118,46 @@ const Home = () => {
             Book Your Wash
           </Button>
         </Link>
+      </div>
+
+      {/* ---------- NEAREST STORES SECTION ---------- */}
+      <div className="mt-16">
+        <Title level={2} className="text-center mb-6">
+          Nearest Washing Centers
+        </Title>
+        {loadingStores ? (
+          <div className="flex justify-center py-6">
+            <Spin tip="Loading stores..." />
+          </div>
+        ) : storeError ? (
+          <Alert type="error" message={storeError} showIcon />
+        ) : stores.length === 0 ? (
+          <Alert type="info" message="No centers added yet." showIcon />
+        ) : (
+          <Row gutter={[16, 16]}>
+            {stores.map((store) => (
+              <Col xs={24} md={12} lg={8} key={store._id}>
+                <Card className="h-full shadow-sm">
+                  <Title level={4}>{store.name}</Title>
+                  <Typography.Paragraph className="mb-1">
+                    {store.address}
+                    {store.city ? `, ${store.city}` : ""}
+                    {store.state ? `, ${store.state}` : ""}
+                    {store.zip ? `, ${store.zip}` : ""}
+                  </Typography.Paragraph>
+                  {store.phone && (
+                    <Typography.Text className="block text-gray-500">
+                      Phone: {store.phone}
+                    </Typography.Text>
+                  )}
+                  <Typography.Text className="text-gray-500 text-sm">
+                    Added: {new Date(store.createdAt).toLocaleDateString()}
+                  </Typography.Text>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
       </div>
     </div>
   )

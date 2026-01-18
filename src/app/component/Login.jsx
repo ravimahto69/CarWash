@@ -1,14 +1,45 @@
-'use client';
+  'use client';
 
-import { Button, Form, Input, Typography } from 'antd';
+import { Button, Form, Input, Typography, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 
 const { Title, Text } = Typography;
 
 export default function LoginForm() {
-  const onFinish = (values) => {
-    console.log('Login Data:', values);
-    form.resetFields();
+  const [form] = Form.useForm();
+  const router = useRouter();
+
+  const onFinish = async (values) => {
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data?.success) {
+        const errorMsg = data?.error || 'Invalid email or password';
+        message.error(errorMsg);
+        return;
+      }
+
+      // Save user data to localStorage
+      try {
+        localStorage.setItem('auth_user', JSON.stringify(data.data));
+        // Dispatch custom event to notify Header component
+        window.dispatchEvent(new Event('user-login'));
+      } catch (_) {}
+
+      message.success('Login successful!');
+      form.resetFields();
+      router.push('/');
+    } catch (err) {
+      console.error('Login submit error:', err);
+      message.error('Something went wrong. Please try again.');
+    }
   };
 
   return (
@@ -20,7 +51,7 @@ export default function LoginForm() {
         Login to your account
       </Text>
 
-      <Form layout="vertical" onFinish={onFinish}>
+      <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Email"
           name="email"
