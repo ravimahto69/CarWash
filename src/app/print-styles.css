@@ -1,0 +1,69 @@
+/* Print Styles - Only show booking details */
+@media print {
+  /* Hide everything by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only booking confirmation container and its children */
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  /* Adjust layout for print */
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Hide buttons and extra sections */
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Print-specific styling */
+  body {
+    margin: 0;
+    padding: 20px;
+    background: white;
+    color: black;
+  }
+
+  .ant-card {
+    page-break-inside: avoid;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+  }
+
+  .ant-descriptions {
+    width: 100%;
+  }
+
+  .ant-descriptions-item {
+    padding: 12px !important;
+  }
+
+  /* Ensure text is visible in print */
+  .dark\\:text-white {
+    color: black !important;
+  }
+
+  .dark\\:bg-gray-800 {
+    background: white !important;
+  }
+
+  .dark\\:border-gray-700 {
+    border-color: #ddd !important;
+  }
+
+  /* Print header */
+  .print-header {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+}

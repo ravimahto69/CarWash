@@ -27,11 +27,24 @@ export default function BookingConfirmation() {
     const fetchData = async () => {
       try {
         // Fetch booking details
+        console.log('Fetching booking with ID:', bookingId);
         const bookingRes = await fetch(`/api/booking?id=${bookingId}`);
+        console.log('Booking response status:', bookingRes.status);
+        
+        if (!bookingRes.ok) {
+          console.error('Booking fetch failed:', bookingRes.status);
+          setError(`Failed to load booking (${bookingRes.status})`);
+          setLoading(false);
+          return;
+        }
+        
         const bookingData = await bookingRes.json();
+        console.log('Booking data:', bookingData);
 
-        if (bookingRes.ok && bookingData.success) {
+        if (bookingData.success) {
           setBooking(bookingData.data);
+        } else {
+          setError(bookingData.error || 'Failed to load booking');
         }
 
         // Fetch payment details if available
@@ -45,7 +58,7 @@ export default function BookingConfirmation() {
         }
       } catch (err) {
         console.error('Error fetching data:', err);
-        setError('Failed to load booking details');
+        setError('Failed to load booking details: ' + err.message);
       } finally {
         setLoading(false);
       }
@@ -81,7 +94,7 @@ export default function BookingConfirmation() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+      <div className="print-area min-h-screen bg-white dark:bg-gray-900 text-white flex items-center justify-center">
         <Spin size="large" tip="Loading booking details..." fullscreen />
       </div>
     );
@@ -89,7 +102,7 @@ export default function BookingConfirmation() {
 
   if (error || !booking) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center p-6">
+      <div className="print-area min-h-screen bg-white  dark:bg-gray-900 flex items-center justify-center p-6">
         <Result
           status="404"
           title="Booking Not Found"
@@ -105,14 +118,14 @@ export default function BookingConfirmation() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-8 px-4 transition-colors print:bg-white">
+    <div className="print-area min-h-screen bg-white dark:bg-gray-900 text-white py-8 px-4 transition-colors print:bg-white">
       <div className="max-w-4xl mx-auto">
         {/* Confirmation Header */}
         <Result
           status="success"
           title="Booking Confirmed!"
           subTitle="Your car wash service has been successfully booked and payment received"
-          className="dark:bg-gray-800 dark:rounded-lg dark:p-6 dark:!text-white print:mb-8"
+          className="dark:bg-gray-800 dark:rounded-lg dark:p-6 dark: text-white print:mb-8"
         />
 
         {/* Booking Details Card */}
@@ -276,14 +289,6 @@ export default function BookingConfirmation() {
             Print Confirmation
           </Button>
 
-          <Button 
-            size="large" 
-            icon={<DownloadOutlined />}
-            onClick={handleDownloadInvoice}
-          >
-            Download Invoice
-          </Button>
-
           <Link href="/">
             <Button 
               size="large" 
@@ -296,7 +301,7 @@ export default function BookingConfirmation() {
 
         {/* Next Steps */}
         <Card 
-          className="mt-8 dark:bg-gray-800 dark:border-gray-700"
+          className="mt-8 dark:bg-gray-800 dark:border-gray-700 print:hidden"
           title={<span className="dark:text-white text-lg font-bold">What's Next?</span>}
         >
           <ol className="list-decimal list-inside space-y-3 text-gray-700 dark:text-gray-300">
