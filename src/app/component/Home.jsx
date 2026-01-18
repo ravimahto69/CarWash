@@ -131,7 +131,7 @@ const Home = () => {
             </Title>
             {loadingStores ? (
               <div className="flex justify-center py-6">
-                <Spin tip="Loading stores..." />
+                <Spin tip="Loading stores..." fullscreen />
               </div>
             ) : storeError ? (
               <Alert type="error" message={storeError} showIcon />
@@ -144,7 +144,7 @@ const Home = () => {
                     <Card
                       hoverable
                       className="h-full shadow-md dark:bg-gray-800 dark:border-gray-700 border border-gray-100"
-                      bodyStyle={{ padding: 18 }}
+                      styles={{ body: { padding: 18 } }}
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div>

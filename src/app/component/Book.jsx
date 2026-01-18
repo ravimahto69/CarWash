@@ -1,7 +1,9 @@
 'use client'
 import React, { useState } from "react";
+import { useRouter } from 'next/navigation';
 
 const BookingPage = () => {
+  const router = useRouter();
   
   const [formData, setFormData] = useState({
     name: "",
@@ -38,7 +40,13 @@ const BookingPage = () => {
         return;
       }
 
-      alert('Your booking has been confirmed!');
+      // Extract amount from service selection
+      const servicePrice = formData.service.match(/\d+/)?.[0] || 600;
+      const bookingId = data.data?.id || data.data?._id;
+
+      // Redirect to payment page
+      router.push(`/payment?bookingId=${bookingId}&amount=${servicePrice}&service=${encodeURIComponent(formData.service)}`);
+      
       setFormData({
         name: '',
         phone: '',
