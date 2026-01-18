@@ -1,11 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, Row, Col, Typography, Button, Spin, Alert } from "antd"
+import { Card, Row, Col, Typography, Button, Spin, Alert, Tag } from "antd"
 import {
   CarOutlined,
   ThunderboltOutlined,
   CrownOutlined,
+  EnvironmentOutlined,
+  PhoneOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons"
 import Link from "next/link"
 
@@ -134,25 +137,65 @@ const Home = () => {
         ) : stores.length === 0 ? (
           <Alert type="info" message="No centers added yet." showIcon />
         ) : (
-          <Row gutter={[16, 16]}>
+          <Row gutter={[20, 20]}>
             {stores.map((store) => (
               <Col xs={24} md={12} lg={8} key={store._id}>
-                <Card className="h-full shadow-sm">
-                  <Title level={4}>{store.name}</Title>
-                  <Typography.Paragraph className="mb-1">
-                    {store.address}
-                    {store.city ? `, ${store.city}` : ""}
-                    {store.state ? `, ${store.state}` : ""}
-                    {store.zip ? `, ${store.zip}` : ""}
-                  </Typography.Paragraph>
+                <Card
+                  hoverable
+                  className="h-full shadow-md border border-gray-100"
+                  bodyStyle={{ padding: 18 }}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <Title level={4} className="!mb-1">
+                        {store.name}
+                      </Title>
+                      <Typography.Text className="text-gray-500 text-sm">
+                        Added {new Date(store.createdAt).toLocaleDateString()}
+                      </Typography.Text>
+                    </div>
+                    <Tag color="blue" icon={<CheckCircleOutlined />}>
+                      Open
+                    </Tag>
+                  </div>
+
+                  <div className="flex items-start gap-2 mb-2 text-gray-700">
+                    <EnvironmentOutlined className="mt-1 text-blue-600" />
+                    <Typography.Paragraph className="!mb-0 text-gray-700">
+                      {store.address}
+                      {store.city ? `, ${store.city}` : ""}
+                      {store.state ? `, ${store.state}` : ""}
+                      {store.zip ? `, ${store.zip}` : ""}
+                    </Typography.Paragraph>
+                  </div>
+
                   {store.phone && (
-                    <Typography.Text className="block text-gray-500">
-                      Phone: {store.phone}
-                    </Typography.Text>
+                    <div className="flex items-center gap-2 text-gray-700 mb-3">
+                      <PhoneOutlined className="text-blue-600" />
+                      <Typography.Text>{store.phone}</Typography.Text>
+                    </div>
                   )}
-                  <Typography.Text className="text-gray-500 text-sm">
-                    Added: {new Date(store.createdAt).toLocaleDateString()}
-                  </Typography.Text>
+
+                  <div className="flex gap-3">
+                    <Button
+                      type="primary"
+                      block
+                      href={store.latitude && store.longitude
+                        ? `https://www.google.com/maps?q=${store.latitude},${store.longitude}`
+                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${store.address} ${store.city || ''} ${store.state || ''} ${store.zip || ''}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View on Map
+                    </Button>
+                    <Button
+                      block
+                      href={store.phone ? `tel:${store.phone}` : undefined}
+                      disabled={!store.phone}
+                    >
+                      Call
+                    </Button>
+                  </div>
                 </Card>
               </Col>
             ))}

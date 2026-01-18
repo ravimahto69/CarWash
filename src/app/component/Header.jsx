@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { Dropdown } from "antd";
 
 const Header = () => {
   const pathname = usePathname();
@@ -10,6 +11,7 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
     // Check if user is logged in
@@ -20,13 +22,16 @@ const Header = () => {
           const user = JSON.parse(authUser);
           setIsLoggedIn(true);
           setUserName(user?.name || 'User');
+          setUserRole(user?.role || '');
         } else {
           setIsLoggedIn(false);
           setUserName('');
+          setUserRole('');
         }
       } catch (_) {
         setIsLoggedIn(false);
         setUserName('');
+        setUserRole('');
       }
     };
     
@@ -82,19 +87,31 @@ const Header = () => {
           ))}
 
           {isLoggedIn && (
-            <span className="text-gray-700 font-semibold">
-              {userName}
-            </span>
+            <Dropdown
+              menu={{
+                items: [
+                  ...(userRole === 'admin' ? [{
+                    key: 'admin',
+                    label: 'Admin Dashboard',
+                    onClick: () => router.push('/admin'),
+                  }] : []),
+                  {
+                    key: 'logout',
+                    label: 'Logout',
+                    onClick: handleLogout,
+                  },
+                ],
+              }}
+              trigger={['click']}
+              overlayStyle={{ zIndex: 9999 }}
+            >
+              <button className="text-gray-700 font-semibold hover:text-blue-600 cursor-pointer">
+                {userName} ▼
+              </button>
+            </Dropdown>
           )}
 
-          {isLoggedIn ? (
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 transition rounded px-8 py-3 text-white"
-            >
-              Logout
-            </button>
-          ) : (
+          {!isLoggedIn && (
             <Link
               href="/register"
               className="bg-blue-600 hover:bg-blue-700 transition rounded px-8 py-3 text-white"
@@ -139,19 +156,39 @@ const Header = () => {
           ))}
 
           {isLoggedIn && (
-            <span className="text-gray-700 font-semibold">
-              {userName}
-            </span>
+            <div className="mt-2 border-t pt-4">
+              <Dropdown
+                menu={{
+                  items: [
+                    ...(userRole === 'admin' ? [{
+                      key: 'admin',
+                      label: 'Admin Dashboard',
+                      onClick: () => {
+                        router.push('/admin');
+                        setOpen(false);
+                      },
+                    }] : []),
+                    {
+                      key: 'logout',
+                      label: 'Logout',
+                      onClick: () => {
+                        handleLogout();
+                        setOpen(false);
+                      },
+                    },
+                  ],
+                }}
+                trigger={['click']}
+                overlayStyle={{ zIndex: 9999 }}
+              >
+                <button className="text-gray-700 font-semibold hover:text-blue-600 cursor-pointer w-full text-left">
+                  {userName} ▼
+                </button>
+              </Dropdown>
+            </div>
           )}
 
-          {isLoggedIn ? (
-            <button
-              onClick={handleLogout}
-              className="mt-2 text-center bg-red-600 hover:bg-red-700 transition rounded py-3 text-white"
-            >
-              Logout
-            </button>
-          ) : (
+          {!isLoggedIn && (
             <Link
               href="/register"
               onClick={() => setOpen(false)}
