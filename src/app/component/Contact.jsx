@@ -6,13 +6,26 @@ const { TextArea } = Input;
 export default function ContactUs() {
   const [form] = Form.useForm();
 
-  const handleSubmit = (values) => {
-    console.log(values);
+  const handleSubmit = async (values) => {
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      })
 
-    message.success("Your message has been sent!");
+      const data = await res.json()
 
-    //  RESET FORM
-    form.resetFields();
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.error || 'Failed to submit')
+      }
+
+      message.success('Your message has been sent!')
+      form.resetFields()
+    } catch (err) {
+      console.error('Contact submit error:', err)
+      message.error(err.message || 'Something went wrong. Please try again.')
+    }
   };
 
   return (

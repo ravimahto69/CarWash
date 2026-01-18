@@ -1,21 +1,12 @@
 import { NextResponse } from 'next/server'
 import dbConnection from '@/app/lib/db'
-import Booking from '@/app/models/Booking'
+import Contact from '@/app/models/Contact'
 
 export async function POST(req) {
 	try {
 		const body = await req.json()
-
-		const required = [
-			'name',
-			'phone',
-			'email',
-			'brand',
-			'model',
-			'vehicleType',
-			'service',
-		]
-
+		
+		const required = ['name', 'email', 'message']
 		const missing = required.filter((k) => !body?.[k] || String(body[k]).trim() === '')
 		if (missing.length) {
 			return NextResponse.json(
@@ -25,28 +16,24 @@ export async function POST(req) {
 		}
 
 		await dbConnection()
+		
 
-		const booking = await Booking.create({
+		const contact = await Contact.create({
 			name: body.name,
-			phone: body.phone,
 			email: body.email,
-			brand: body.brand,
-			model: body.model,
-			vehicleType: body.vehicleType,
-			service: body.service,
-			location: body.location || '',
-			notes: body.notes || '',
+			message: body.message,
 		})
 
 		return NextResponse.json(
-			{ success: true, bookingId: booking._id, data: booking },
+			{ success: true, contactId: contact._id, data: contact },
 			{ status: 201 }
 		)
 	} catch (err) {
-		console.error('Booking POST error:', err)
+		console.error('Contact POST error:', err)
 		return NextResponse.json(
-			{ success: false, error: 'Failed to create booking' },
+			{ success: false, error: err?.message || 'Failed to submit contact message' },
 			{ status: 500 }
 		)
 	}
 }
+
