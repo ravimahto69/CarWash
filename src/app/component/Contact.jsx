@@ -29,13 +29,13 @@ export default function ContactUs() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg grid md:grid-cols-2">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center px-4 transition-colors">
+      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-xl shadow-lg grid md:grid-cols-2">
         
         {/* Left Section */}
-        <div className="bg-blue-600 text-white p-8 rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+        <div className="bg-blue-600 dark:bg-blue-900 text-white p-8 rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
           <h2 className="text-3xl font-bold mb-4">Contact Us</h2>
-          <p className="text-blue-100 mb-6">
+          <p className="text-blue-100 dark:text-blue-200 mb-6">
             Have questions or feedback? We’d love to hear from you.
           </p>
 
@@ -55,30 +55,30 @@ export default function ContactUs() {
             className="space-y-2"
           >
             <Form.Item
-              label="Full Name"
+              label={<span className="dark:text-gray-300">Full Name</span>}
               name="name"
               rules={[{ required: true, message: "Please enter your name" }]}
             >
-              <Input placeholder="John Doe" />
+              <Input placeholder="John Doe" className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
             </Form.Item>
 
             <Form.Item
-              label="Email Address"
+              label={<span className="dark:text-gray-300">Email Address</span>}
               name="email"
               rules={[
                 { required: true, message: "Please enter your email" },
                 { type: "email", message: "Enter a valid email" },
               ]}
             >
-              <Input placeholder="john@example.com" />
+              <Input placeholder="john@example.com" className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
             </Form.Item>
 
             <Form.Item
-              label="Message"
+              label={<span className="dark:text-gray-300">Message</span>}
               name="message"
               rules={[{ required: true, message: "Please enter your message" }]}
             >
-              <TextArea rows={4} placeholder="How can we help you?" />
+              <TextArea rows={4} placeholder="How can we help you?" className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
             </Form.Item>
 
             <Form.Item>

@@ -44,11 +44,11 @@ export default function RegisterForm({children}) {
 
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-white/90 backdrop-blur-md p-8 shadow-2xl">
-      <Title level={2} className="!mb-1 text-center">
+    <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-800 p-8 shadow-2xl transition-colors">
+      <Title level={2} className="!mb-1 text-center dark:!text-white">
         Create Account 
       </Title>
-      <Text className="block text-center text-gray-500 mb-6">
+      <Text className="block text-center text-gray-500 dark:text-gray-400 mb-6">
         Sign up to get started
       </Text>
 
@@ -58,7 +58,7 @@ export default function RegisterForm({children}) {
         onFinish={onFinish}      
       >
         <Form.Item
-          label="Full Name"
+          label={<span className="dark:text-gray-300">Full Name</span>}
           name="name"
           rules={[{ required: true, message: 'Name is required' }]}
         >
@@ -66,7 +66,7 @@ export default function RegisterForm({children}) {
         </Form.Item>
 
         <Form.Item
-          label="Email"
+          label={<span className="dark:text-gray-300">Email</span>}
           name="email"
           rules={[
             { required: true, message: 'Email is required' },
@@ -77,7 +77,7 @@ export default function RegisterForm({children}) {
         </Form.Item>
 
         <Form.Item
-          label="Password"
+          label={<span className="dark:text-gray-300">Password</span>}
           name="password"
           rules={[
             { required: true, message: 'Password is required' },
@@ -89,7 +89,7 @@ export default function RegisterForm({children}) {
         </Form.Item>
 
         <Form.Item
-          label="Confirm Password"
+          label={<span className="dark:text-gray-300">Confirm Password</span>}
           name="confirmPassword"
           dependencies={['password']}
           hasFeedback
@@ -119,9 +119,9 @@ export default function RegisterForm({children}) {
         </Button>
       </Form>
 
-      <p className="mt-6 text-center text-sm text-gray-600">
+      <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
         Already have an account?
-        <a href="/login" className="ml-1 font-medium text-blue-600 hover:underline">
+        <a href="/login" className="ml-1 font-medium text-blue-600 dark:text-blue-400 hover:underline">
           Login
         </a>
       </p>

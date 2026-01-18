@@ -43,17 +43,17 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-white/90 backdrop-blur-md p-8 shadow-2xl items-center ">
-      <Title level={2} className="!mb-1 text-center">
+    <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-800 p-8 shadow-2xl items-center transition-colors ">
+      <Title level={2} className="!mb-1 text-center dark:!text-white">
         Login
       </Title>
-      <Text className="block text-center text-gray-500 mb-6">
+      <Text className="block text-center text-gray-500 dark:text-gray-400 mb-6">
         Login to your account
       </Text>
 
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
-          label="Email"
+          label={<span className="dark:text-gray-300">Email</span>}
           name="email"
           rules={[
             { required: true, message: 'Email is required' },
@@ -68,7 +68,7 @@ export default function LoginForm() {
         </Form.Item>
 
         <Form.Item
-          label="Password"
+          label={<span className="dark:text-gray-300">Password</span>}
           name="password"
           rules={[{ required: true, message: 'Password is required' }]}
         >
@@ -90,9 +90,9 @@ export default function LoginForm() {
         </Button>
       </Form>
 
-      <p className="mt-6 text-center text-sm text-gray-600">
-        Don’t have an account?
-        <a href="/register" className="ml-1 font-medium text-blue-600 hover:underline">
+      <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+        Don't have an account?
+        <a href="/register" className="ml-1 font-medium text-blue-600 dark:text-blue-400 hover:underline">
           Register
         </a>
       </p>

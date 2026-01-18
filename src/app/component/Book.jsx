@@ -59,13 +59,13 @@ const BookingPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 text-black">
-      <h1 className="text-3xl font-bold mb-6 text-black">Book a Service</h1>
+    <div className="max-w-4xl mx-auto p-6 text-black dark:text-white bg-white dark:bg-gray-900 min-h-screen transition-colors">
+      <h1 className="text-3xl font-bold mb-6 text-black dark:text-white">Book a Service</h1>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Personal Details */}
         <section>
-          <h2 className="text-xl text-black font-bold mb-4">
+          <h2 className="text-xl text-black dark:text-white font-bold mb-4">
             Personal Details
           </h2>
 
@@ -75,7 +75,7 @@ const BookingPage = () => {
               name="name"
               required
               placeholder="Name"
-              className="input"
+              className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               value={formData.name}
               onChange={handleChange}
             />
@@ -84,7 +84,7 @@ const BookingPage = () => {
               name="phone"
               required
               placeholder="Phone Number"
-              className="input"
+              className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               value={formData.phone}
               onChange={handleChange}
             />
@@ -95,7 +95,7 @@ const BookingPage = () => {
             name="email"
             required
             placeholder="Email Address"
-            className="input mt-4"
+            className="input mt-4 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             value={formData.email}
             onChange={handleChange}
           />
@@ -103,7 +103,7 @@ const BookingPage = () => {
 
         {/* Vehicle Details */}
         <section>
-          <h2 className="text-xl text-black font-bold mb-4">
+          <h2 className="text-xl text-black dark:text-white font-bold mb-4">
             Vehicle Details
           </h2>
 
@@ -113,7 +113,7 @@ const BookingPage = () => {
               name="brand"
               required
               placeholder="Car Brand"
-              className="input"
+              className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               value={formData.brand}
               onChange={handleChange}
             />
@@ -122,7 +122,7 @@ const BookingPage = () => {
               name="model"
               required
               placeholder="Car Model"
-              className="input"
+              className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               value={formData.model}
               onChange={handleChange}
             />
@@ -131,7 +131,7 @@ const BookingPage = () => {
           <select
             name="vehicleType"
             required
-            className="input mt-4"
+            className="input mt-4 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             value={formData.vehicleType}
             onChange={handleChange}
           >
@@ -146,14 +146,14 @@ const BookingPage = () => {
 
         {/* Service Details */}
         <section>
-          <h2 className="text-xl text-black font-bold mb-4">
+          <h2 className="text-xl text-black dark:text-white font-bold mb-4">
             Service Details
           </h2>
 
           <select
             name="service"
             required
-            className="input"
+            className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             value={formData.service}
             onChange={handleChange}
           >
@@ -167,7 +167,7 @@ const BookingPage = () => {
             type="text"
             name="location"
             placeholder="Enter Your Location"
-            className="input mt-4"
+            className="input mt-4 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             value={formData.location}
             onChange={handleChange}
           />
@@ -176,7 +176,7 @@ const BookingPage = () => {
             name="notes"
             rows={3}
             placeholder="Additional Notes"
-            className="input mt-4"
+            className="input mt-4 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             value={formData.notes}
             onChange={handleChange}
           />
@@ -185,7 +185,7 @@ const BookingPage = () => {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+          className="w-full bg-blue-600 dark:bg-blue-700 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-blue-800 transition"
         >
           Confirm Booking
         </button>
@@ -202,6 +202,15 @@ const BookingPage = () => {
           .input:focus {
             border-color: #2563eb;
             box-shadow: 0 0 0 1px #2563eb;
+          }
+          .dark .input {
+            border-color: #4b5563;
+            background-color: #1f2937;
+            color: #ffffff;
+          }
+          .dark .input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6;
           }
         `}
       </style>

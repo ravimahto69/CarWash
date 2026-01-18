@@ -4,10 +4,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Dropdown } from "antd";
+import { useTheme } from "../context/ThemeContext";
+import { SunOutlined, MoonOutlined } from "@ant-design/icons";
 
 const Header = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const { isDark, toggleTheme, mounted } = useTheme();
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
@@ -63,10 +66,10 @@ const Header = () => {
   };
 
   return (
-    <nav className="z-[2000] bg-white shadow-lg sticky top-0 left-0 w-full">
+    <nav className="z-[2000] bg-white dark:bg-gray-900 shadow-lg sticky top-0 left-0 w-full transition-colors">
       <div className="px-6 md:px-20 py-5 flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="font-extrabold text-2xl text-blue-600">
+        <Link href="/" className="font-extrabold text-2xl text-blue-600 dark:text-blue-400">
           WashHub
         </Link>
 
@@ -78,13 +81,27 @@ const Header = () => {
               href={item.href}
               className={
                 pathname === item.href || pathname.startsWith(item.href + "/")
-                  ? "text-blue-600 font-semibold"
-                  : "text-black font-normal hover:text-blue-500 transition"
+                  ? "text-blue-600 dark:text-blue-400 font-semibold"
+                  : "text-black dark:text-gray-300 font-normal hover:text-blue-500 dark:hover:text-blue-400 transition"
               }
             >
               {item.label}
             </Link>
           ))}
+
+          {mounted && (
+            <button
+              onClick={() => {
+                console.log('Theme toggle clicked, current isDark:', isDark);
+                toggleTheme();
+              }}
+              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              aria-label="Toggle theme"
+            >
+              {isDark ? <SunOutlined className="text-xl" /> : <MoonOutlined className="text-xl" />}
+            </button>
+          )}
 
           {isLoggedIn && (
             <Dropdown
@@ -105,7 +122,7 @@ const Header = () => {
               trigger={['click']}
               overlayStyle={{ zIndex: 9999 }}
             >
-              <button className="text-gray-700 font-semibold hover:text-blue-600 cursor-pointer">
+              <button className="text-gray-700 dark:text-gray-300 font-semibold hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">
                 {userName} ▼
               </button>
             </Dropdown>
@@ -114,7 +131,7 @@ const Header = () => {
           {!isLoggedIn && (
             <Link
               href="/register"
-              className="bg-blue-600 hover:bg-blue-700 transition rounded px-8 py-3 text-white"
+              className="bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 transition rounded px-8 py-3 text-white"
             >
               Sign Up
             </Link>
@@ -122,20 +139,35 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden flex flex-col gap-1"
-          aria-label="Toggle Menu"
-        >
-          <span className="w-6 h-[2px] bg-black" />
-          <span className="w-6 h-[2px] bg-black" />
-          <span className="w-6 h-[2px] bg-black" />
-        </button>
+        <div className="md:hidden flex items-center gap-4">
+          {mounted && (
+            <button
+              onClick={() => {
+                console.log('Mobile theme toggle clicked, current isDark:', isDark);
+                toggleTheme();
+              }}
+              className="text-gray-700 dark:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              aria-label="Toggle theme"
+            >
+              {isDark ? <SunOutlined className="text-xl" /> : <MoonOutlined className="text-xl" />}
+            </button>
+          )}
+          <button
+            onClick={() => setOpen(!open)}
+            className="flex flex-col gap-1 cursor-pointer"
+            aria-label="Toggle Menu"
+          >
+            <span className="w-6 h-[2px] bg-black dark:bg-white" />
+            <span className="w-6 h-[2px] bg-black dark:bg-white" />
+            <span className="w-6 h-[2px] bg-black dark:bg-white" />
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden bg-white shadow-md transition-all duration-300 overflow-hidden ${
+        className={`md:hidden bg-white dark:bg-gray-900 shadow-md transition-all duration-300 overflow-hidden ${
           open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
@@ -147,8 +179,8 @@ const Header = () => {
               onClick={() => setOpen(false)}
               className={
                 pathname === item.href || pathname.startsWith(item.href + "/")
-                  ? "text-blue-600"
-                  : "text-black hover:text-blue-500"
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-black dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400"
               }
             >
               {item.label}
@@ -156,7 +188,7 @@ const Header = () => {
           ))}
 
           {isLoggedIn && (
-            <div className="mt-2 border-t pt-4">
+            <div className="mt-2 border-t dark:border-gray-700 pt-4">
               <Dropdown
                 menu={{
                   items: [
@@ -181,7 +213,7 @@ const Header = () => {
                 trigger={['click']}
                 overlayStyle={{ zIndex: 9999 }}
               >
-                <button className="text-gray-700 font-semibold hover:text-blue-600 cursor-pointer w-full text-left">
+                <button className="text-gray-700 dark:text-gray-300 font-semibold hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer w-full text-left">
                   {userName} ▼
                 </button>
               </Dropdown>
@@ -192,7 +224,7 @@ const Header = () => {
             <Link
               href="/register"
               onClick={() => setOpen(false)}
-              className="mt-2 text-center bg-blue-600 hover:bg-blue-700 transition rounded py-3 text-white"
+              className="mt-2 text-center bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 transition rounded py-3 text-white"
             >
               Sign Up
             </Link>

@@ -4,6 +4,7 @@ import "antd/dist/reset.css"; // ✅ required for Ant Design
 import Layout from "antd/es/layout/layout";
 import Header from "./component/Header";
 import Footer from "./component/Footer";
+import { ThemeProvider } from "./context/ThemeContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,19 +27,19 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900 transition-colors`}
       >
-      <header>
-        <Header/>
-      </header>
-        <Layout>
-          {children}
-        </Layout>
-        <footer>
-          <Footer/>
-        </footer>
-        
-        
+        <ThemeProvider>
+          <header>
+            <Header/>
+          </header>
+          <Layout className="bg-white dark:bg-gray-900 transition-colors">
+            {children}
+          </Layout>
+          <footer>
+            <Footer/>
+          </footer>
+        </ThemeProvider>
       </body>
     </html>
   );
