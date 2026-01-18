@@ -9,13 +9,36 @@ const { Title, Text } = Typography;
 export default function RegisterForm({children}) {
 
  
-  const [form] = Form.useForm(); 
-    const router = useRouter()
-  const onFinish = (values) => {
-    console.log('Register Data:', values);
-    form.resetFields();
-  
-    router.push("/login")
+  const [form] = Form.useForm()
+  const router = useRouter()
+
+  const onFinish = async (values) => {
+    try {
+      // Send registration data to the API
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || !data?.success) {
+        // Show error message from API
+        const errorMsg = data?.error || 'Registration failed'
+        console.error('Registration error:', errorMsg)
+        return // Don't proceed if registration failed
+      }
+
+      // Show success message
+      console.log('Registration successful:', data.userId)
+
+      // Reset form and redirect to login
+      form.resetFields()
+      router.push('/login')
+    } catch (err) {
+      console.error('Register submit error:', err)
+    }
   };
 
 
