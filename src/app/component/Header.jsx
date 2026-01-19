@@ -53,7 +53,7 @@ const Header = () => {
     { label: "Home", href: "/" },
     { label: "Services", href: "/services" },
     { label: "Book Now", href: "/book" },
-    ...(isLoggedIn ? [] : [{ label: "Login", href: "/login" }]),
+    ...(isLoggedIn ? [{ label: "My Bookings", href: "/dashboard" }] : [{ label: "Login", href: "/login" }]),
   ];
 
   const handleLogout = () => {
@@ -107,6 +107,11 @@ const Header = () => {
             <Dropdown
               menu={{
                 items: [
+                  {
+                    key: 'bookings',
+                    label: 'My Bookings',
+                    onClick: () => router.push('/dashboard'),
+                  },
                   ...(userRole === 'admin' ? [{
                     key: 'admin',
                     label: 'Admin Dashboard',

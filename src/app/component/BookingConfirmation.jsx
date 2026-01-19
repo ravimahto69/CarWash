@@ -39,7 +39,7 @@ export default function BookingConfirmation() {
         }
         
         const bookingData = await bookingRes.json();
-        console.log('Booking data:', bookingData);
+        
 
         if (bookingData.success) {
           setBooking(bookingData.data);
