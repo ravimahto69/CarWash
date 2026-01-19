@@ -125,7 +125,7 @@ export default function BookingConfirmation() {
           status="success"
           title="Booking Confirmed!"
           subTitle="Your car wash service has been successfully booked and payment received"
-          className="dark:bg-gray-800 dark:rounded-lg dark:p-6 dark: text-white print:mb-8"
+          className="dark:bg-gray-800 dark:rounded-lg dark:p-6 dark:!text-white print:mb-8"
         />
 
         {/* Booking Details Card */}

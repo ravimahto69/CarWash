@@ -2,6 +2,28 @@
 import React, { useState } from "react";
 import { useRouter } from 'next/navigation';
 
+const serviceOptions = [
+  { label: "Bike Basic Wash", price: 199, vehicle: "Bike / Scooter" },
+  { label: "Bike Premium Foam", price: 349, vehicle: "Bike / Scooter" },
+  { label: "Hatchback Basic Wash", price: 399, vehicle: "Hatchback" },
+  { label: "Sedan Premium Wash", price: 699, vehicle: "Sedan" },
+  { label: "SUV Deep Clean", price: 899, vehicle: "SUV" },
+  { label: "Luxury Detailing", price: 1299, vehicle: "Luxury" },
+  { label: "Interior Spa", price: 599, vehicle: "Any" },
+  { label: "Ceramic Coat Prep", price: 1499, vehicle: "Any" },
+];
+
+const vehicleTypes = [
+  "Bike / Scooter",
+  "Hatchback",
+  "Sedan",
+  "SUV",
+  "Luxury",
+  "Pickup / Van",
+  "Truck",
+  "Electric (EV)",
+];
+
 const BookingPage = () => {
   const router = useRouter();
   
@@ -18,10 +40,18 @@ const BookingPage = () => {
     location: "",
     notes: "",
   });
+  const [selectedPrice, setSelectedPrice] = useState(0);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));    
+  };
+
+  const handleServiceChange = (e) => {
+    const value = e.target.value;
+    const match = serviceOptions.find((s) => s.label === value);
+    setSelectedPrice(match?.price || 0);
+    setFormData((prev) => ({ ...prev, service: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -40,8 +70,8 @@ const BookingPage = () => {
         return;
       }
 
-      // Extract amount from service selection
-      const servicePrice = formData.service.match(/\d+/)?.[0] || 600;
+      // Extract amount from selected service
+      const servicePrice = selectedPrice || formData.service.match(/\d+/)?.[0] || 600;
       const bookingId = data.data?.id || data.data?._id;
 
       // Redirect to payment page
@@ -120,7 +150,7 @@ const BookingPage = () => {
               type="text"
               name="brand"
               required
-              placeholder="Car Brand"
+              placeholder="Vehicle Brand (e.g., Honda, Bajaj, Maruti)"
               className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               value={formData.brand}
               onChange={handleChange}
@@ -129,7 +159,7 @@ const BookingPage = () => {
               type="text"
               name="model"
               required
-              placeholder="Car Model"
+              placeholder="Model (e.g., Activa, City, Creta)"
               className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               value={formData.model}
               onChange={handleChange}
@@ -144,11 +174,9 @@ const BookingPage = () => {
             onChange={handleChange}
           >
             <option value="">Select Vehicle Type</option>
-            <option>Sedan</option>
-            <option>SUV</option>
-            <option>Hatchback</option>
-            <option>Truck</option>
-            <option>Bus</option>
+            {vehicleTypes.map((v) => (
+              <option key={v}>{v}</option>
+            ))}
           </select>
         </section>
 
@@ -163,12 +191,14 @@ const BookingPage = () => {
             required
             className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             value={formData.service}
-            onChange={handleChange}
+            onChange={handleServiceChange}
           >
             <option value="">Select Wash Package</option>
-            <option>Basic Wash – 300</option>
-            <option>Premium Wash – 600</option>
-            <option>Deluxe Wash – 1000</option>
+            {serviceOptions.map((svc) => (
+              <option key={svc.label} value={svc.label}>
+                {svc.label} — ₹{svc.price} ({svc.vehicle})
+              </option>
+            ))}
           </select>
 
           <input

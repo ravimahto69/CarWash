@@ -9,6 +9,12 @@ const BookingSchema = new mongoose.Schema(
     model: { type: String, required: true, trim: true },
     vehicleType: { type: String, required: true, trim: true },
     service: { type: String, required: true, trim: true },
+    amount: { type: Number, required: true, default: 0 },
+    bookingStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'completed', 'cancelled'],
+      default: 'pending',
+    },
     date: { type: String, trim: true },
     time: { type: String, trim: true },
     location: { type: String, trim: true },
