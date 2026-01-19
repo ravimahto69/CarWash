@@ -5,6 +5,7 @@ import { Card, Button, Spin, Result, Descriptions, Table, Space } from 'antd';
 import { PrinterOutlined, DownloadOutlined, HomeOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
+import ReviewSection from './ReviewSection';
 
 export default function BookingConfirmation() {
   const searchParams = useSearchParams();
@@ -312,6 +313,21 @@ export default function BookingConfirmation() {
             <li>You can track your booking status in your profile</li>
           </ol>
         </Card>
+
+        {/* Review Section - Only show for completed bookings */}
+        {booking && booking.bookingStatus === 'completed' && (
+          <Card 
+            className="mt-8 dark:bg-gray-800 dark:border-gray-700 print:hidden"
+            title={<span className="dark:text-white text-lg font-bold">Share Your Feedback</span>}
+          >
+            <ReviewSection 
+              serviceId={booking.serviceId || null}
+              bookingId={booking._id}
+              userName={booking.name}
+              userEmail={booking.email}
+            />
+          </Card>
+        )}
       </div>
     </div>
   );

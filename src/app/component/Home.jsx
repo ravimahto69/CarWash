@@ -201,83 +201,135 @@ const Home = () => {
 
         {/* ---------- NEAREST STORES SECTION ---------- */}
         <div className="mt-16">
-          <Title level={2} className="text-center mb-6 dark:!text-white">
-              Nearest Washing Centers
+          <div className="text-center mb-10">
+            <Title level={2} className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 !mb-2 dark:!text-transparent">
+               Nearest Washing Centers
             </Title>
-            {loadingStores ? (
-              <div className="flex justify-center py-6">
-                <Spin tip="Loading stores..." fullscreen />
-              </div>
-            ) : storeError ? (
-              <Alert type="error" message={storeError} showIcon />
-            ) : stores.length === 0 ? (
-              <Alert type="info" message="No centers added yet." showIcon />
-            ) : (
-              <Row gutter={[20, 20]}>
-                {stores.map((store) => (
-                  <Col xs={24} md={12} lg={8} key={store._id}>
-                    <Card
-                      hoverable
-                      className="h-full shadow-md dark:bg-gray-800 dark:border-gray-700 border border-gray-100"
-                      styles={{ body: { padding: 18 } }}
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <Title level={4} className="!mb-1 dark:!text-white">
-                            {store.name}
-                          </Title>
-                          <Typography.Text className="text-gray-500 dark:text-gray-400 text-sm">
-                            Added {new Date(store.createdAt).toLocaleDateString()}
-                          </Typography.Text>
+            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Visit our premium car washing centers near you for quality service
+            </p>
+          </div>
+
+          {loadingStores ? (
+            <div className="flex justify-center py-12">
+              <Spin size="large" tip="Loading centers..." />
+            </div>
+          ) : storeError ? (
+            <Alert 
+              type="error" 
+              message="Unable to Load Centers" 
+              description={storeError}
+              showIcon 
+              className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            />
+          ) : stores.length === 0 ? (
+            <Alert 
+              type="info" 
+              message="No Centers Available" 
+              description="We're expanding to more locations soon. Check back later!"
+              showIcon 
+              className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            />
+          ) : (
+            <Row gutter={[20, 20]}>
+              {stores.map((store, index) => (
+                <Col xs={24} md={12} lg={8} key={store._id}>
+                  <Card
+                    hoverable
+                    className="h-full shadow-lg hover:shadow-2xl dark:bg-gray-800 dark:border-gray-700 border-2 border-gray-200 dark:hover:border-blue-500 hover:border-blue-300 transition-all duration-300 rounded-2xl overflow-hidden group"
+                    styles={{ body: { padding: 0 } }}
+                  >
+                    {/* Header with gradient background */}
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 p-6 text-white relative">
+                      <div className="absolute top-4 right-4 bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold shadow-lg">
+                        {index + 1}
+                      </div>
+                      <h3 className="text-xl font-bold mb-1 pr-16">
+                        {store.name}
+                      </h3>
+                      <div className="flex items-center gap-2 text-blue-100 text-sm">
+                        <CheckCircleOutlined />
+                        <span>Open & Ready</span>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      {/* Location */}
+                      <div className="mb-5 pb-5 border-b border-gray-200 dark:border-gray-600">
+                        <div className="flex gap-3">
+                          <EnvironmentOutlined className="text-2xl text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">ADDRESS</p>
+                            <p className="text-gray-800 dark:text-white font-semibold text-sm leading-relaxed">
+                              {store.address}
+                              {store.city ? `, ${store.city}` : ""}
+                              {store.state ? `, ${store.state}` : ""}
+                              {store.zip ? ` - ${store.zip}` : ""}
+                            </p>
+                          </div>
                         </div>
-                        <Tag color="blue" icon={<CheckCircleOutlined />}>
-                          Open
-                        </Tag>
                       </div>
 
-                      <div className="flex items-start gap-2 mb-2 text-gray-700 dark:text-gray-400">
-                        <EnvironmentOutlined className="mt-1 text-blue-600 dark:text-blue-400" />
-                        <Typography.Paragraph className="!mb-0 text-gray-700 dark:text-gray-400">
-                          {store.address}
-                          {store.city ? `, ${store.city}` : ""}
-                          {store.state ? `, ${store.state}` : ""}
-                          {store.zip ? `, ${store.zip}` : ""}
-                        </Typography.Paragraph>
-                      </div>
-
+                      {/* Phone */}
                       {store.phone && (
-                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-400 mb-3">
-                          <PhoneOutlined className="text-blue-600 dark:text-blue-400" />
-                          <Typography.Text>{store.phone}</Typography.Text>
+                        <div className="mb-5 pb-5 border-b border-gray-200 dark:border-gray-600">
+                          <div className="flex items-center gap-3">
+                            <PhoneOutlined className="text-2xl text-green-600 dark:text-green-400 flex-shrink-0" />
+                            <div>
+                              <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">PHONE</p>
+                              <a 
+                                href={`tel:${store.phone}`}
+                                className="text-gray-800 dark:text-white font-semibold text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                              >
+                                {store.phone}
+                              </a>
+                            </div>
+                          </div>
                         </div>
                       )}
 
+                      {/* Added Date */}
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-5">
+                        Added {new Date(store.createdAt).toLocaleDateString('en-IN', { 
+                          day: 'numeric', 
+                          month: 'short', 
+                          year: 'numeric' 
+                        })}
+                      </div>
+
+                      {/* Action Buttons */}
                       <div className="flex gap-3">
                         <Button
                           type="primary"
                           block
+                          size="large"
                           href={store.latitude && store.longitude
                             ? `https://www.google.com/maps?q=${store.latitude},${store.longitude}`
                             : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${store.address} ${store.city || ''} ${store.state || ''} ${store.zip || ''}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
+                          className="h-10 font-bold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-none shadow-md hover:shadow-lg"
                         >
-                          View on Map
+                          📍 Map
                         </Button>
                         <Button
                           block
+                          size="large"
                           href={store.phone ? `tel:${store.phone}` : undefined}
                           disabled={!store.phone}
+                          className="h-10 font-bold border-2 border-green-500 text-green-600 dark:text-green-400 dark:border-green-400 hover:bg-green-50 dark:hover:bg-gray-700 transition-colors"
                         >
-                          Call
+                          📞 Call
                         </Button>
                       </div>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            )}
-          </div>
+                    </div>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
+        </div>
         </div>
       </div>
     )
