@@ -16,6 +16,8 @@ import {
   Tag,
   message,
   Statistic,
+  Modal,
+  Popconfirm,
 } from "antd"
 import {
   ShoppingOutlined,
@@ -24,6 +26,8 @@ import {
   LogoutOutlined,
   PlusOutlined,
   CheckCircleOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons"
 
 const AdminDashboard = () => {
@@ -38,6 +42,9 @@ const AdminDashboard = () => {
   const [stores, setStores] = useState([])
   const [bookings, setBookings] = useState([])
   const [loadingBookings, setLoadingBookings] = useState(false)
+
+  const [editingService, setEditingService] = useState(null)
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false)
 
   const vehicleTypeOptions = [
     { label: "Bike / Scooter", value: "bike" },
@@ -111,6 +118,57 @@ const AdminDashboard = () => {
       loadData()
     } catch {
       message.error("Service creation failed")
+    }
+  }
+
+  /* ---------------- EDIT SERVICE MODAL -------- */
+  const openEditModal = (service) => {
+    setEditingService(service)
+    serviceForm.setFieldsValue({
+      name: service.name,
+      description: service.description,
+      durationMin: service.durationMin,
+      vehicleTags: service.vehicleTags || [],
+      prices: service.prices || {},
+      isActive: service.isActive,
+    })
+    setIsEditModalVisible(true)
+  }
+
+  const onEditService = async (values) => {
+    if (!editingService) return
+    try {
+      const res = await fetch(`/api/services/${editingService._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      })
+      const data = await res.json()
+
+      if (!res.ok) return message.error(data.error || "Update failed")
+      message.success("Service updated")
+      setIsEditModalVisible(false)
+      setEditingService(null)
+      serviceForm.resetFields()
+      loadData()
+    } catch {
+      message.error("Service update failed")
+    }
+  }
+
+  /* ------------ DELETE SERVICE ----------- */
+  const onDeleteService = async (serviceId) => {
+    try {
+      const res = await fetch(`/api/services/${serviceId}`, {
+        method: "DELETE",
+      })
+      const data = await res.json()
+
+      if (!res.ok) return message.error(data.error || "Delete failed")
+      message.success("Service deleted")
+      loadData()
+    } catch {
+      message.error("Service deletion failed")
     }
   }
 
@@ -273,55 +331,124 @@ const AdminDashboard = () => {
             <>
               <Card 
                 title={<span className="text-2xl font-bold dark:text-white"><ShoppingOutlined /> Add Service</span>} 
-                className="mb-6 border border-gray-200 dark:border-gray-700 shadow-lg bg-white dark:bg-gray-800"
+                className="mb-6 border-2 border-blue-300 dark:border-blue-600 shadow-xl bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900"
               >
                 <Form form={serviceForm} layout="vertical" onFinish={onAddService}>
-                  <Form.Item name="name" label={<span className="text-gray-800 dark:text-white font-bold text-base">Service Name</span>} required>
-                    <Input placeholder="e.g., Bike Premium Foam, SUV Deep Clean" className="h-11 text-base font-semibold bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500 placeholder-gray-500 dark:placeholder-gray-300" />
-                  </Form.Item>
+                  {/* Basic Info Section */}
+                  <div className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-900 dark:to-blue-800 p-6 rounded-xl mb-6 border-2 border-blue-300 dark:border-blue-600 shadow-md">
+                    <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 mb-5 flex items-center gap-2">
+                      <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">1</span>
+                      Basic Information
+                    </h3>
+                    
+                    <Form.Item name="name" label={<span className="text-gray-800 dark:text-white font-bold text-sm">Service Name *</span>} required>
+                      <Input 
+                        placeholder="e.g., Bike Premium Foam" 
+                        className="h-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base border-2 border-blue-300 dark:border-blue-500 rounded-lg shadow-sm hover:border-blue-400 focus:border-blue-500 placeholder-blue-500 dark:placeholder-blue-300 font-semibold"
+                      />
+                    </Form.Item>
 
-                  <Form.Item name="description" label={<span className="text-gray-800 dark:text-white font-bold text-base">Description</span>}>
-                    <Input placeholder="Short description (shown on site)" className="h-11 text-base bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500" />
-                  </Form.Item>
+                    <Form.Item name="description" label={<span className="text-gray-800 dark:text-white font-bold text-sm">What's Included</span>}>
+                      <Input 
+                        placeholder="e.g., Foam wash + chain clean + polish" 
+                        className="h-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base border-2 border-blue-300 dark:border-blue-500 rounded-lg shadow-sm hover:border-blue-400 focus:border-blue-500 placeholder-blue-500 dark:placeholder-blue-300"
+                      />
+                    </Form.Item>
 
-                  <Row gutter={12}>
-                    <Col xs={24} md={12}>
-                      <Form.Item name="durationMin" label={<span className="text-gray-800 dark:text-white font-bold text-base">Duration (min)</span>}>
-                        <InputNumber className="w-full h-11 bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500" placeholder="e.g., 30" />
-                      </Form.Item>
-                    </Col>
-                    <Col xs={24} md={12}>
-                      <Form.Item name="vehicleTags" label={<span className="text-gray-800 dark:text-white font-bold text-base">Applicable Vehicles</span>}>
-                        <Form.Item name="vehicleTags" noStyle>
-                          <select multiple className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white w-full h-[44px]">
-                            {vehicleTypeOptions.map(v => (
-                              <option key={v.value} value={v.value}>{v.label}</option>
-                            ))}
-                          </select>
-                        </Form.Item>
-                      </Form.Item>
-                    </Col>
-                  </Row>
+                    <Form.Item name="durationMin" label={<span className="text-gray-800 dark:text-white font-bold text-sm">Duration (minutes)</span>}>
+                      <InputNumber 
+                        placeholder="30" 
+                        className="w-full h-12 bg-white dark:bg-gray-700 text-base border-2 border-blue-300 dark:border-blue-500 rounded-lg shadow-sm hover:border-blue-400 focus:border-blue-500 placeholder-blue-500 dark:placeholder-blue-300 [&>input]:text-gray-900 dark:[&>input]:text-white [&>input]:font-semibold"
+                        min={1}
+                        type="number"
+                        parser={(value) => {
+                          const num = parseInt(value);
+                          return isNaN(num) ? undefined : num;
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
 
-                  <div className="mb-2 font-semibold text-gray-700 dark:text-gray-200">Per-vehicle prices (₹)</div>
-                  <Row gutter={12}>
-                    {vehicleTypeOptions.map((v) => (
-                      <Col xs={24} md={12} lg={8} key={v.value}>
-                        <Form.Item name={["prices", v.value]} label={<span className="text-gray-800 dark:text-white text-sm font-semibold">{v.label}</span>}>
-                          <InputNumber className="w-full h-10 bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500" placeholder="₹" />
-                        </Form.Item>
-                      </Col>
-                    ))}
-                  </Row>
-
-                  <Form.Item name="isActive" valuePropName="checked" initialValue>
-                    <div className="flex items-center gap-2">
-                      <Switch />
-                      <span className="text-gray-800 dark:text-gray-200 font-medium">Active</span>
+                  {/* Vehicles & Pricing Section */}
+                  <div className="bg-gradient-to-r from-green-100 to-green-50 dark:from-green-900 dark:to-green-800 p-6 rounded-xl mb-6 border-2 border-green-300 dark:border-green-600 shadow-md">
+                    <h3 className="font-bold text-lg text-green-900 dark:text-green-100 mb-2 flex items-center gap-2">
+                      <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">2</span>
+                      Select Vehicles & Set Prices
+                    </h3>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-5 ml-8">Choose which vehicles this service applies to and set the price for each</p>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 ml-2">
+                      {vehicleTypeOptions.map((v) => (
+                        <div key={v.value} className="bg-white dark:bg-gray-700 p-4 rounded-xl border-2 border-green-200 dark:border-green-600 hover:border-green-400 hover:shadow-lg transition-all duration-200 cursor-pointer">
+                          <label className="flex items-start gap-3 cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              value={v.value}
+                              onChange={(e) => {
+                                const currentTags = serviceForm.getFieldValue("vehicleTags") || [];
+                                if (e.target.checked) {
+                                  serviceForm.setFieldValue("vehicleTags", [...currentTags, v.value]);
+                                } else {
+                                  serviceForm.setFieldValue("vehicleTags", currentTags.filter(tag => tag !== v.value));
+                                }
+                              }}
+                              className="w-5 h-5 rounded cursor-pointer mt-1 accent-green-500"
+                            />
+                            <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{v.label}</span>
+                          </label>
+                        </div>
+                      ))}
                     </div>
-                  </Form.Item>
-                  <Button type="primary" htmlType="submit" block className="h-10 font-semibold text-base" icon={<PlusOutlined />}>
-                    Save Service
+
+                    <div className="bg-white dark:bg-gray-700 p-6 rounded-xl border-2 border-green-300 dark:border-green-600 shadow-sm">
+                      <p className="text-sm font-bold text-green-900 dark:text-green-100 mb-5 flex items-center gap-2">
+                        <span className="bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">₹</span>
+                        Set Prices for Selected Vehicles
+                      </p>
+                      <Row gutter={[12, 12]}>
+                        {vehicleTypeOptions.map((v) => (
+                          <Col xs={24} sm={12} md={6} key={v.value}>
+                            <Form.Item name={["prices", v.value]} label={<span className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-2">{v.label}</span>}>
+                              <InputNumber 
+                                placeholder="0" 
+                                className="w-full h-11 bg-white dark:bg-gray-700 text-base border-2 border-green-300 dark:border-green-500 rounded-lg shadow-sm hover:border-green-400 focus:border-green-500 placeholder-green-500 dark:placeholder-green-300 [&>input]:text-gray-900 dark:[&>input]:text-white [&>input]:font-bold"
+                                min={0}
+                                type="number"
+                                prefix="₹"
+                                parser={(value) => {
+                                  const num = parseInt(value);
+                                  return isNaN(num) ? undefined : num;
+                                }}
+                              />
+                            </Form.Item>
+                          </Col>
+                        ))}
+                      </Row>
+                    </div>
+                  </div>
+
+                  {/* Status Section */}
+                  <div className="bg-gradient-to-r from-purple-100 to-purple-50 dark:from-purple-900 dark:to-purple-800 p-6 rounded-xl mb-6 border-2 border-purple-300 dark:border-purple-600 shadow-md flex items-center justify-between">
+                    <div>
+                      <p className="font-bold text-lg text-purple-900 dark:text-purple-100 flex items-center gap-2 mb-1">
+                        <span className="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">3</span>
+                        Service Status
+                      </p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 ml-8">Enable this service for customer bookings</p>
+                    </div>
+                    <Form.Item name="isActive" valuePropName="checked" initialValue className="mb-0">
+                      <Switch size="large" />
+                    </Form.Item>
+                  </div>
+
+                  <Button 
+                    type="primary" 
+                    htmlType="submit" 
+                    block 
+                    className="h-13 font-bold text-base bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 border-none shadow-lg hover:shadow-xl transition-all duration-200" 
+                    icon={<PlusOutlined className="text-lg" />}
+                  >
+                    Create Service
                   </Button>
                 </Form>
               </Card>
@@ -338,7 +465,12 @@ const AdminDashboard = () => {
                     <List.Item className="py-4 pl-6 pr-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-500 transition-colors duration-200">
                       <div className="w-full">
                         <div className="flex justify-between items-center">
-                          <span className="font-semibold text-lg dark:text-white">{item.name}</span>
+                          <div className="flex-1">
+                            <span className="font-semibold text-lg dark:text-white">{item.name}</span>
+                            {item.description && (
+                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{item.description}</p>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2 flex-wrap justify-end">
                             {item?.prices && Object.entries(item.prices).filter(([_, val]) => val !== undefined && val !== null).map(([key, val]) => (
                               <Tag key={key} color="blue" className="mr-0">{key.toUpperCase()} ₹{val}</Tag>
@@ -349,6 +481,32 @@ const AdminDashboard = () => {
                             <Tag color={item.isActive ? "green" : "red"}>
                               {item.isActive ? "Active" : "Inactive"}
                             </Tag>
+                            <Button 
+                              type="primary" 
+                              size="small"
+                              icon={<EditOutlined />}
+                              onClick={() => openEditModal(item)}
+                              className="ml-2"
+                            >
+                              Edit
+                            </Button>
+                            <Popconfirm
+                              title="Delete Service"
+                              description="Are you sure you want to delete this service?"
+                              onConfirm={() => onDeleteService(item._id)}
+                              okText="Yes"
+                              cancelText="No"
+                              okButtonProps={{ danger: true }}
+                            >
+                              <Button 
+                                type="primary"
+                                danger
+                                size="small"
+                                icon={<DeleteOutlined />}
+                              >
+                                Delete
+                              </Button>
+                            </Popconfirm>
                           </div>
                         </div>
                       </div>
@@ -423,6 +581,143 @@ const AdminDashboard = () => {
           )}
         </Col>
       </Row>
+
+      {/* --------- EDIT SERVICE MODAL ---------- */}
+      <Modal
+        title={<span className="text-2xl font-bold text-gray-800 dark:text-black">✏️ Edit Service</span>}
+        open={isEditModalVisible}
+        onCancel={() => {
+          setIsEditModalVisible(false)
+          setEditingService(null)
+          serviceForm.resetFields()
+        }}
+        footer={null}
+        width={800}
+        className="dark:bg-gray-900"
+        bodyStyle={{ backgroundColor: '#f9fafb', padding: '24px' }}
+      >
+        <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6">
+          <Form form={serviceForm} layout="vertical" onFinish={onEditService}>
+            {/* Basic Info Section */}
+            <div className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-900 dark:to-blue-800 p-6 rounded-xl mb-6 border-2 border-blue-300 dark:border-blue-600 shadow-md">
+              <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 mb-5 flex items-center gap-2">
+                <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">1</span>
+                Basic Information
+              </h3>
+              
+              <Form.Item name="name" label={<span className="text-gray-800 dark:text-white font-bold text-sm">Service Name *</span>} required>
+                <Input 
+                  placeholder="e.g., Bike Premium Foam" 
+                  className="h-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base border-2 border-blue-300 dark:border-blue-500 rounded-lg shadow-sm hover:border-blue-400 focus:border-blue-500 placeholder-blue-500 dark:placeholder-blue-300 font-semibold"
+                />
+              </Form.Item>
+
+              <Form.Item name="description" label={<span className="text-gray-800 dark:text-white font-bold text-sm">What's Included</span>}>
+                <Input 
+                  placeholder="e.g., Foam wash + chain clean + polish" 
+                  className="h-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base border-2 border-blue-300 dark:border-blue-500 rounded-lg shadow-sm hover:border-blue-400 focus:border-blue-500 placeholder-blue-500 dark:placeholder-blue-300"
+                />
+              </Form.Item>
+
+              <Form.Item name="durationMin" label={<span className="text-gray-800 dark:text-white font-bold text-sm">Duration (minutes)</span>}>
+                <InputNumber 
+                  placeholder="30" 
+                  className="w-full h-12 bg-white dark:bg-gray-700 text-base border-2 border-blue-300 dark:border-blue-500 rounded-lg shadow-sm hover:border-blue-400 focus:border-blue-500 placeholder-blue-500 dark:placeholder-blue-300 [&>input]:text-gray-900 dark:[&>input]:text-white [&>input]:font-semibold"
+                  min={1}
+                  type="number"
+                  parser={(value) => {
+                    const num = parseInt(value);
+                    return isNaN(num) ? undefined : num;
+                  }}
+                />
+              </Form.Item>
+            </div>
+
+            {/* Vehicles & Pricing Section */}
+            <div className="bg-gradient-to-r from-green-100 to-green-50 dark:from-green-900 dark:to-green-800 p-6 rounded-xl mb-6 border-2 border-green-300 dark:border-green-600 shadow-md">
+              <h3 className="font-bold text-lg text-green-900 dark:text-green-100 mb-2 flex items-center gap-2">
+                <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">2</span>
+                Select Vehicles & Set Prices
+              </h3>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-5 ml-8">Choose which vehicles this service applies to and set the price for each</p>
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6 ml-2">
+                {vehicleTypeOptions.map((v) => (
+                  <div key={v.value} className="bg-white dark:bg-gray-700 p-4 rounded-xl border-2 border-green-200 dark:border-green-600 hover:border-green-400 hover:shadow-lg transition-all duration-200 cursor-pointer">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        value={v.value}
+                        onChange={(e) => {
+                          const currentTags = serviceForm.getFieldValue("vehicleTags") || [];
+                          if (e.target.checked) {
+                            serviceForm.setFieldValue("vehicleTags", [...currentTags, v.value]);
+                          } else {
+                            serviceForm.setFieldValue("vehicleTags", currentTags.filter(tag => tag !== v.value));
+                          }
+                        }}
+                        className="w-5 h-5 rounded cursor-pointer mt-1 accent-green-500"
+                      />
+                      <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{v.label}</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-white dark:bg-gray-700 p-6 rounded-xl border-2 border-green-300 dark:border-green-600 shadow-sm">
+                <p className="text-sm font-bold text-green-900 dark:text-green-100 mb-5 flex items-center gap-2">
+                  <span className="bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">₹</span>
+                  Set Prices (₹) for Selected Vehicles
+                </p>
+                <Row gutter={[12, 12]}>
+                  {vehicleTypeOptions.map((v) => (
+                    <Col xs={24} sm={12} md={8} key={v.value}>
+                      <Form.Item name={["prices", v.value]} label={<span className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-2">{v.label}</span>}>
+                        <InputNumber 
+                          placeholder="0" 
+                          className="w-full h-11 bg-white dark:bg-gray-700 text-base border-2 border-green-300 dark:border-green-500 rounded-lg shadow-sm hover:border-green-400 focus:border-green-500 placeholder-green-500 dark:placeholder-green-300 [&>input]:text-gray-900 dark:[&>input]:text-white [&>input]:font-bold"
+                          min={0}
+                          type="number"
+                          prefix="₹"
+                          parser={(value) => {
+                            const num = parseInt(value);
+                            return isNaN(num) ? undefined : num;
+                          }}
+                        />
+                      </Form.Item>
+                    </Col>
+                  ))}
+                </Row>
+              </div>
+            </div>
+
+            {/* Status Section */}
+            <div className="bg-gradient-to-r from-purple-100 to-purple-50 dark:from-purple-900 dark:to-purple-800 p-6 rounded-xl mb-6 border-2 border-purple-300 dark:border-purple-600 shadow-md flex items-center justify-between">
+              <div>
+                <p className="font-bold text-lg text-purple-900 dark:text-purple-100 flex items-center gap-2 mb-1">
+                  <span className="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">3</span>
+                  Service Status
+                </p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 ml-8">Enable this service for customer bookings</p>
+              </div>
+              <Form.Item name="isActive" valuePropName="checked" className="mb-0">
+                <Switch size="large" />
+              </Form.Item>
+            </div>
+
+            <Form.Item>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                block 
+                className="h-12 font-bold text-base bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-none shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                💾 Update Service
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      </Modal>
     </div>
   )
 }
