@@ -39,6 +39,17 @@ const AdminDashboard = () => {
   const [bookings, setBookings] = useState([])
   const [loadingBookings, setLoadingBookings] = useState(false)
 
+  const vehicleTypeOptions = [
+    { label: "Bike / Scooter", value: "bike" },
+    { label: "Hatchback", value: "hatchback" },
+    { label: "Sedan", value: "sedan" },
+    { label: "SUV", value: "suv" },
+    { label: "Luxury", value: "luxury" },
+    { label: "Pickup / Van", value: "pickup" },
+    { label: "Truck", value: "truck" },
+    { label: "Electric (EV)", value: "ev" },
+  ]
+
   /* ---------------- AUTH CHECK ---------------- */
   useEffect(() => {
     const authUser = localStorage.getItem("auth_user")
@@ -266,11 +277,43 @@ const AdminDashboard = () => {
               >
                 <Form form={serviceForm} layout="vertical" onFinish={onAddService}>
                   <Form.Item name="name" label={<span className="text-gray-800 dark:text-white font-bold text-base">Service Name</span>} required>
-                    <Input placeholder="Enter service name" className="h-11 text-base font-semibold bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500 placeholder-gray-500 dark:placeholder-gray-300" />
+                    <Input placeholder="e.g., Bike Premium Foam, SUV Deep Clean" className="h-11 text-base font-semibold bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500 placeholder-gray-500 dark:placeholder-gray-300" />
                   </Form.Item>
-                  <Form.Item name="price" label={<span className="text-gray-800 dark:text-white font-bold text-base">Price (₹)</span>} required>
-                    <InputNumber className="w-full h-11 text-base font-semibold bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500" placeholder="Enter price" />
+
+                  <Form.Item name="description" label={<span className="text-gray-800 dark:text-white font-bold text-base">Description</span>}>
+                    <Input placeholder="Short description (shown on site)" className="h-11 text-base bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500" />
                   </Form.Item>
+
+                  <Row gutter={12}>
+                    <Col xs={24} md={12}>
+                      <Form.Item name="durationMin" label={<span className="text-gray-800 dark:text-white font-bold text-base">Duration (min)</span>}>
+                        <InputNumber className="w-full h-11 bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500" placeholder="e.g., 30" />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Form.Item name="vehicleTags" label={<span className="text-gray-800 dark:text-white font-bold text-base">Applicable Vehicles</span>}>
+                        <Form.Item name="vehicleTags" noStyle>
+                          <select multiple className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white w-full h-[44px]">
+                            {vehicleTypeOptions.map(v => (
+                              <option key={v.value} value={v.value}>{v.label}</option>
+                            ))}
+                          </select>
+                        </Form.Item>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
+                  <div className="mb-2 font-semibold text-gray-700 dark:text-gray-200">Per-vehicle prices (₹)</div>
+                  <Row gutter={12}>
+                    {vehicleTypeOptions.map((v) => (
+                      <Col xs={24} md={12} lg={8} key={v.value}>
+                        <Form.Item name={["prices", v.value]} label={<span className="text-gray-800 dark:text-white text-sm font-semibold">{v.label}</span>}>
+                          <InputNumber className="w-full h-10 bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500" placeholder="₹" />
+                        </Form.Item>
+                      </Col>
+                    ))}
+                  </Row>
+
                   <Form.Item name="isActive" valuePropName="checked" initialValue>
                     <div className="flex items-center gap-2">
                       <Switch />
@@ -296,8 +339,13 @@ const AdminDashboard = () => {
                       <div className="w-full">
                         <div className="flex justify-between items-center">
                           <span className="font-semibold text-lg dark:text-white">{item.name}</span>
-                          <div className="flex items-center gap-3">
-                            <span className="text-lg font-bold text-green-600 dark:text-green-400">₹{item.price}</span>
+                          <div className="flex items-center gap-2 flex-wrap justify-end">
+                            {item?.prices && Object.entries(item.prices).filter(([_, val]) => val !== undefined && val !== null).map(([key, val]) => (
+                              <Tag key={key} color="blue" className="mr-0">{key.toUpperCase()} ₹{val}</Tag>
+                            ))}
+                            {(!item?.prices || Object.keys(item.prices || {}).length === 0) && item.price !== undefined && (
+                              <Tag color="green">₹{item.price}</Tag>
+                            )}
                             <Tag color={item.isActive ? "green" : "red"}>
                               {item.isActive ? "Active" : "Inactive"}
                             </Tag>

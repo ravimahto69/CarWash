@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, Row, Col, Typography, Button, Spin, Alert, Tag } from "antd"
+import { Card, Row, Col, Typography, Button, Spin, Alert, Tag, Space } from "antd"
 import {
   CarOutlined,
   ThunderboltOutlined,
@@ -9,6 +9,9 @@ import {
   EnvironmentOutlined,
   PhoneOutlined,
   CheckCircleOutlined,
+  FireOutlined,
+  DashboardOutlined,
+  ToolOutlined,
 } from "@ant-design/icons"
 import Link from "next/link"
 
@@ -16,19 +19,46 @@ const { Title, Paragraph } = Typography
 
 const services = [
   {
-    title: "Basic Wash",
-    icon: <CarOutlined className="text-4xl text-blue-600 dark:text-blue-400" />,
-    desc: "Exterior wash with foam and quick dry",
+    title: "Bike Foam Wash",
+    icon: <FireOutlined className="text-4xl text-orange-500 dark:text-orange-300" />,
+    desc: "Streak-free foam wash for bikes & scooters with chain lube option.",
+    badge: "Bike / Scooter",
+    price: "From ₹199",
   },
   {
-    title: "Premium Wash",
-    icon: <ThunderboltOutlined className="text-4xl text-green-600 dark:text-green-400" />,
-    desc: "Interior + exterior deep cleaning",
+    title: "SUV Deep Clean",
+    icon: <ThunderboltOutlined className="text-4xl text-emerald-500 dark:text-emerald-300" />,
+    desc: "Pressure rinse, foam, interior vacuum, mats & dashboard sanitize.",
+    badge: "SUV / MUV",
+    price: "From ₹899",
+  },
+  {
+    title: "Ceramic Prep",
+    icon: <ToolOutlined className="text-4xl text-sky-500 dark:text-sky-300" />,
+    desc: "Pre-coat decontamination, clay, polish for long-lasting shine.",
+    badge: "Any Vehicle",
+    price: "From ₹1499",
+  },
+  {
+    title: "Interior Spa",
+    icon: <DashboardOutlined className="text-4xl text-indigo-500 dark:text-indigo-300" />,
+    desc: "Steam + vacuum, upholstery refresh, dash & console detail.",
+    badge: "Cars / SUVs",
+    price: "From ₹599",
   },
   {
     title: "Luxury Detailing",
-    icon: <CrownOutlined className="text-4xl text-yellow-500 dark:text-yellow-400" />,
-    desc: "Complete detailing & polishing",
+    icon: <CrownOutlined className="text-4xl text-amber-500 dark:text-amber-300" />,
+    desc: "Multi-stage polish, trim restore, tyre dressing, glass care.",
+    badge: "Premium",
+    price: "From ₹1299",
+  },
+  {
+    title: "Express Hatchback",
+    icon: <CarOutlined className="text-4xl text-blue-500 dark:text-blue-300" />,
+    desc: "Quick foam wash + interior wipe-down for busy weekdays.",
+    badge: "Hatchback",
+    price: "From ₹399",
   },
 ]
 
@@ -60,68 +90,113 @@ const Home = () => {
     <div className="w-full bg-white dark:bg-gray-900 transition-colors">
       <div className="max-w-7xl mx-auto px-6 py-10">
         {/* ---------- HERO SECTION ---------- */}
-        <div className="text-center mb-20">
-          <Title level={1} className="dark:!text-white">
-            Premium Car Wash at Your Doorstep 
-          </Title>
-          <Paragraph className="text-gray-500 dark:text-gray-400 text-lg">
-            Book professional car wash services in minutes
-          </Paragraph>
-
-          <div className="flex justify-center gap-4 mt-6">
-            <Link href="/book">
-              <Button type="primary" size="large">
-                Book Now
-              </Button>
-            </Link>
-
-            <Link href="/services">
-              <Button size="large">View Services</Button>
-            </Link>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 text-white px-8 py-14 shadow-2xl mb-16">
+          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.3),_transparent_35%)]" />
+          <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+            <div className="max-w-2xl">
+              <p className="uppercase tracking-[0.25em] text-xs text-blue-200 mb-3">India • Cars • Bikes • EVs</p>
+              <Title level={1} className="!text-white leading-tight mb-3">
+                Multi-Vehicle Wash & Detail, On-Demand
+              </Title>
+              <Paragraph className="text-gray-200 text-lg mb-4">
+                Foam wash, interior spa, ceramic prep—tailored packages for bikes, hatchbacks, sedans, SUVs, and EVs. Pick a slot, we arrive.
+              </Paragraph>
+              <Space size="middle" wrap>
+                <Link href="/book">
+                  <Button type="primary" size="large" className="!bg-blue-500 !border-none hover:!bg-blue-600">Book a Slot</Button>
+                </Link>
+                <Link href="/services">
+                  <Button size="large" className="bg-white/10 text-white border-white/30 hover:bg-white/20">View Packages</Button>
+                </Link>
+              </Space>
+              <div className="flex flex-wrap gap-2 mt-6 text-xs text-blue-100">
+                {['Bike Foam', 'SUV Deep Clean', 'Interior Spa', 'Ceramic Prep', 'Doorstep Service'].map((chip) => (
+                  <span key={chip} className="px-3 py-1 rounded-full bg-white/10 border border-white/20">{chip}</span>
+                ))}
+              </div>
+            </div>
+            <div className="bg-white/5 border border-white/15 rounded-xl p-5 w-full lg:w-[340px]">
+              <Title level={4} className="!text-white !mb-3">Popular quick picks</Title>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-white/10">
+                  <div>
+                    <p className="text-white font-semibold">Bike Premium Foam</p>
+                    <p className="text-blue-100 text-xs">15 min • Chain lube add-on</p>
+                  </div>
+                  <span className="text-white font-bold">₹349</span>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-white/10">
+                  <div>
+                    <p className="text-white font-semibold">SUV Deep Clean</p>
+                    <p className="text-blue-100 text-xs">40 min • Interior vacuum</p>
+                  </div>
+                  <span className="text-white font-bold">₹899</span>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-white/10">
+                  <div>
+                    <p className="text-white font-semibold">Ceramic Prep</p>
+                    <p className="text-blue-100 text-xs">Paint decontam + polish</p>
+                  </div>
+                  <span className="text-white font-bold">₹1499</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* ---------- SERVICES SECTION ---------- */}
-        <Title level={2} className="text-center mb-12 dark:!text-white">
-            Our Services
-        </Title>
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <Title level={2} className="!mb-0 dark:!text-white">Signature packages</Title>
+          <div className="flex gap-2 text-xs text-gray-600 dark:text-gray-300">
+            <Tag color="blue">Doorstep</Tag>
+            <Tag color="green">Eco foam</Tag>
+            <Tag color="gold">Interior care</Tag>
+          </div>
+        </div>
 
-        <Row gutter={[24, 24]}>
+        <Row gutter={[20, 20]}>
           {services.map((service, index) => (
             <Col xs={24} md={12} lg={8} key={index}>
               <Card
                 hoverable
-                className="h-full text-center shadow-md hover:shadow-xl transition dark:bg-gray-800 dark:border-gray-700"
+                className="h-full shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100 dark:border-gray-700 dark:bg-gray-800"
+                styles={{ body: { padding: 18 } }}
               >
-                {service.icon}
-                <Title level={4} className="mt-4 dark:!text-white">
-                  {service.title}
-                </Title>
-                <Paragraph className="text-gray-500 dark:text-gray-400">
-                  {service.desc}
-                </Paragraph>
+                <div className="flex items-start gap-3">
+                  {service.icon}
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <Title level={4} className="!mb-1 dark:!text-white">{service.title}</Title>
+                      <Tag color="blue" className="font-semibold">{service.price}</Tag>
+                    </div>
+                    <Paragraph className="text-gray-600 dark:text-gray-300 !mb-2">
+                      {service.desc}
+                    </Paragraph>
+                    <Tag color="geekblue" className="mr-0">{service.badge}</Tag>
+                  </div>
+                </div>
               </Card>
             </Col>
           ))}
         </Row>
 
         {/* ---------- CTA SECTION ---------- */}
-        <div className="mt-20 bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-900 dark:to-indigo-900 rounded-xl text-white text-center py-16 px-6">
-          <Title level={2} className="!text-white">
-            Ready to Shine Your Car? 
-          </Title>
-          <Paragraph className="text-gray-200 dark:text-gray-300 text-lg">
-            Schedule a car wash today and experience professional care.
-          </Paragraph>
-
-          <Link href="/book">
-            <Button
-              size="large"
-              className="!bg-white !text-blue-600 font-semibold mt-4"
-            >
-              Book Your Wash
-            </Button>
-          </Link>
+        <div className="mt-16 grid gap-6 lg:grid-cols-3">
+          <Card className="shadow-lg border border-gray-100 dark:border-gray-700 dark:bg-gray-800" styles={{ body: { padding: 18 } }}>
+            <p className="text-sm text-gray-500 dark:text-gray-300 mb-1">Response</p>
+            <Title level={3} className="!mb-1 dark:!text-white">30-45 mins</Title>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">Avg arrival time in serviceable zones.</p>
+          </Card>
+          <Card className="shadow-lg border border-gray-100 dark:border-gray-700 dark:bg-gray-800" styles={{ body: { padding: 18 } }}>
+            <p className="text-sm text-gray-500 dark:text-gray-300 mb-1">Eco water usage</p>
+            <Title level={3} className="!mb-1 dark:!text-white">~35 L</Title>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">Foam + pressure rinse with low waste.</p>
+          </Card>
+          <Card className="shadow-lg border border-gray-100 dark:border-gray-700 dark:bg-gray-800" styles={{ body: { padding: 18 } }}>
+            <p className="text-sm text-gray-500 dark:text-gray-300 mb-1">Coverage</p>
+            <Title level={3} className="!mb-1 dark:!text-white">Cars, Bikes, EVs</Title>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">City-wide slots, 7 days a week.</p>
+          </Card>
         </div>
 
         {/* ---------- NEAREST STORES SECTION ---------- */}

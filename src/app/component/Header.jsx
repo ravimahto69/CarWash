@@ -120,7 +120,7 @@ const Header = () => {
                 ],
               }}
               trigger={['click']}
-              overlayStyle={{ zIndex: 9999 }}
+              styles={{ root: { zIndex: 9999 } }}
             >
               <button className="text-gray-700 dark:text-gray-300 font-semibold hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">
                 {userName} ▼

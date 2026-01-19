@@ -1,28 +1,47 @@
 'use client'
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter } from 'next/navigation';
 
-const serviceOptions = [
-  { label: "Bike Basic Wash", price: 199, vehicle: "Bike / Scooter" },
-  { label: "Bike Premium Foam", price: 349, vehicle: "Bike / Scooter" },
-  { label: "Hatchback Basic Wash", price: 399, vehicle: "Hatchback" },
-  { label: "Sedan Premium Wash", price: 699, vehicle: "Sedan" },
-  { label: "SUV Deep Clean", price: 899, vehicle: "SUV" },
-  { label: "Luxury Detailing", price: 1299, vehicle: "Luxury" },
-  { label: "Interior Spa", price: 599, vehicle: "Any" },
-  { label: "Ceramic Coat Prep", price: 1499, vehicle: "Any" },
-];
+// Static pricing data structure - all vehicles and wash types
+const PRICING_DATA = {
+  'Bike / Scooter': [
+    { type: 'Basic Wash', description: 'Water rinse + shampoo', price: 149 },
+    { type: 'Foam Wash', description: 'Foam + pressure wash + dry', price: 199 },
+    { type: 'Premium Care', description: 'Foam wash + chain clean + polish', price: 299 },
+  ],
+  'Hatchback': [
+    { type: 'Basic Wash', description: 'Exterior wash & dry', price: 399 },
+    { type: 'Foam Wash', description: 'Foam wash + tyre clean', price: 499 },
+    { type: 'Interior + Exterior', description: 'Foam wash + vacuum + dashboard', price: 699 },
+  ],
+  'Sedan': [
+    { type: 'Basic Wash', description: 'Exterior wash', price: 449 },
+    { type: 'Foam Wash', description: 'Foam + tyre & rim clean', price: 599 },
+    { type: 'Full Cleaning', description: 'Foam + interior vacuum + polish', price: 899 },
+  ],
+  'SUV': [
+    { type: 'Basic Wash', description: 'Exterior wash', price: 599 },
+    { type: 'Foam Wash', description: 'Foam wash + tyre cleaning', price: 799 },
+    { type: 'Deep Clean', description: 'Exterior + interior + mats', price: 999 },
+  ],
+  'Electric (EV)': [
+    { type: 'Safe Wash', description: 'Low-water exterior wash', price: 499 },
+    { type: 'Foam Wash', description: 'EV-safe foam + tyre clean', price: 699 },
+    { type: 'Premium EV Care', description: 'Foam + interior vacuum', price: 899 },
+  ],
+  'Pickup / Van': [
+    { type: 'Basic Wash', description: 'Exterior wash', price: 699 },
+    { type: 'Foam Wash', description: 'Foam + tyre cleaning', price: 899 },
+    { type: 'Full Service', description: 'Exterior + interior', price: 1199 },
+  ],
+  'Truck': [
+    { type: 'Basic Wash', description: 'Exterior water wash', price: 999 },
+    { type: 'Foam Wash', description: 'Foam + pressure wash', price: 1299 },
+    { type: 'Premium Clean', description: 'Full body + cabin', price: 1599 },
+  ],
+};
 
-const vehicleTypes = [
-  "Bike / Scooter",
-  "Hatchback",
-  "Sedan",
-  "SUV",
-  "Luxury",
-  "Pickup / Van",
-  "Truck",
-  "Electric (EV)",
-];
+const vehicleTypes = Object.keys(PRICING_DATA);
 
 const BookingPage = () => {
   const router = useRouter();
@@ -42,6 +61,16 @@ const BookingPage = () => {
   });
   const [selectedPrice, setSelectedPrice] = useState(0);
 
+  const filteredServices = useMemo(() => {
+    if (!formData.vehicleType) return [];
+    return PRICING_DATA[formData.vehicleType] || [];
+  }, [formData.vehicleType]);
+
+  const selectServiceOption = (washType, price) => {
+    setFormData((prev) => ({ ...prev, service: washType }));
+    setSelectedPrice(price);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));    
@@ -49,8 +78,8 @@ const BookingPage = () => {
 
   const handleServiceChange = (e) => {
     const value = e.target.value;
-    const match = serviceOptions.find((s) => s.label === value);
-    setSelectedPrice(match?.price || 0);
+    const matchedService = filteredServices.find((s) => s.type === value);
+    setSelectedPrice(matchedService?.price || 0);
     setFormData((prev) => ({ ...prev, service: value }));
   };
 
@@ -194,12 +223,67 @@ const BookingPage = () => {
             onChange={handleServiceChange}
           >
             <option value="">Select Wash Package</option>
-            {serviceOptions.map((svc) => (
-              <option key={svc.label} value={svc.label}>
-                {svc.label} — ₹{svc.price} ({svc.vehicle})
+            {filteredServices.map((svc) => (
+              <option key={svc.type} value={svc.type}>
+                {svc.type} — ₹{svc.price}
               </option>
             ))}
           </select>
+
+          {/* Category-specific recommendations */}
+          {formData.vehicleType && filteredServices.length > 0 && (
+            <div className="mt-6">
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4">Recommended Packages for {formData.vehicleType}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {filteredServices.map((svc) => (
+                  <div key={svc.type} className="p-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 hover:shadow-md transition-shadow">
+                    <div>
+                      <p className="font-bold text-lg text-black dark:text-white">{svc.type}</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">{svc.description}</p>
+                      <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-4">₹{svc.price}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => selectServiceOption(svc.type, svc.price)}
+                      className="mt-4 w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+                    >
+                      Select
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!formData.vehicleType && (
+            <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">Please select a vehicle type to see available packages.</p>
+          )}
+        </section>
+
+        {/* Booking Details */}
+        <section>
+          <h2 className="text-xl text-black dark:text-white font-bold mb-4">
+            Booking Details
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="date"
+              name="date"
+              required
+              className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              value={formData.date}
+              onChange={handleChange}
+            />
+            <input
+              type="time"
+              name="time"
+              required
+              className="input dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              value={formData.time}
+              onChange={handleChange}
+            />
+          </div>
 
           <input
             type="text"

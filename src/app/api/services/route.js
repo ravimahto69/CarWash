@@ -16,7 +16,7 @@ export async function GET() {
 export async function POST(req) {
   try {
     const body = await req.json()
-    const required = ['name', 'price']
+    const required = ['name']
     const missing = required.filter((k) => !body?.[k] || String(body[k]).trim() === '')
     if (missing.length) {
       return NextResponse.json(
@@ -27,11 +27,28 @@ export async function POST(req) {
 
     await dbConnection()
 
+    // Normalize prices
+    const prices = typeof body.prices === 'object' && body.prices !== null ? body.prices : {}
+    // Backward compatibility: if price provided but no prices map
+    if (!prices || Object.keys(prices).length === 0) {
+      if (body.price !== undefined && body.price !== null && String(body.price).trim() !== '') {
+        prices.any = Number(body.price)
+      }
+    } else {
+      // ensure numbers
+      for (const key of Object.keys(prices)) {
+        const val = prices[key]
+        prices[key] = val !== undefined && val !== null && String(val).trim() !== '' ? Number(val) : undefined
+      }
+    }
+
     const service = await Service.create({
       name: body.name,
       description: body.description || '',
-      price: Number(body.price),
-      duration: body.duration || '',
+      price: body.price !== undefined ? Number(body.price) : undefined,
+      prices,
+      durationMin: body.durationMin ? Number(body.durationMin) : undefined,
+      vehicleTags: Array.isArray(body.vehicleTags) ? body.vehicleTags : [],
       isActive: body.isActive !== undefined ? !!body.isActive : true,
     })
 
