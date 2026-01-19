@@ -16,8 +16,8 @@ export async function GET() {
 export async function POST(req) {
   try {
     const body = await req.json()
-    const required = ['name', 'address']
-    const missing = required.filter((k) => !body?.[k] || String(body[k]).trim() === '')
+    const required = ['name', 'address', 'latitude', 'longitude']
+    const missing = required.filter((k) => !body?.[k] && body[k] !== 0 && body[k] !== false)
     if (missing.length) {
       return NextResponse.json(
         { success: false, error: `Missing required fields: ${missing.join(', ')}` },
@@ -27,21 +27,29 @@ export async function POST(req) {
 
     await dbConnection()
 
-    const store = await Store.create({
+    // Prepare store data
+    const storeData = {
       name: body.name,
       address: body.address,
       city: body.city || '',
       state: body.state || '',
       zip: body.zip || '',
       phone: body.phone || '',
-      latitude: body.latitude !== undefined ? Number(body.latitude) : undefined,
-      longitude: body.longitude !== undefined ? Number(body.longitude) : undefined,
+      latitude: Number(body.latitude),
+      longitude: Number(body.longitude),
+      // Create GeoJSON location object for geospatial queries
+      location: {
+        type: 'Point',
+        coordinates: [Number(body.longitude), Number(body.latitude)] // [longitude, latitude]
+      },
       isActive: body.isActive !== undefined ? !!body.isActive : true,
-    })
+    }
+
+    const store = await Store.create(storeData)
 
     return NextResponse.json({ success: true, data: store }, { status: 201 })
   } catch (err) {
     console.error('Stores POST error:', err)
-    return NextResponse.json({ success: false, error: 'Failed to create store' }, { status: 500 })
+    return NextResponse.json({ success: false, error: err.message || 'Failed to create store' }, { status: 500 })
   }
 }

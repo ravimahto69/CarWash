@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Input, Button, message, Spin, Empty, Tag } from 'antd';
 import { StarOutlined, StarFilled, UserOutlined } from '@ant-design/icons';
 
@@ -16,14 +16,7 @@ const ReviewSection = ({ serviceId, bookingId, userName, userEmail }) => {
   const [comment, setComment] = useState('');
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    loadReviews();
-    if (bookingId) {
-      checkIfReviewed();
-    }
-  }, [serviceId, bookingId]);
-
-  const loadReviews = async () => {
+  const loadReviews = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/reviews?serviceId=${serviceId}`);
@@ -37,9 +30,9 @@ const ReviewSection = ({ serviceId, bookingId, userName, userEmail }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [serviceId]);
 
-  const checkIfReviewed = async () => {
+  const checkIfReviewed = useCallback(async () => {
     try {
       const res = await fetch(`/api/reviews/booking/${bookingId}`);
       const data = await res.json();
@@ -49,7 +42,14 @@ const ReviewSection = ({ serviceId, bookingId, userName, userEmail }) => {
     } catch (err) {
       console.error('Failed to check review status:', err);
     }
-  };
+  }, [bookingId]);
+
+  useEffect(() => {
+    loadReviews();
+    if (bookingId) {
+      checkIfReviewed();
+    }
+  }, [serviceId, bookingId, loadReviews, checkIfReviewed]);
 
   const handleSubmitReview = async () => {
     if (!bookingId) {
@@ -285,7 +285,7 @@ const ReviewSection = ({ serviceId, bookingId, userName, userEmail }) => {
             {review.comment && (
               <div className="mb-4">
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed italic">
-                  "{review.comment}"
+                  &quot;{review.comment}&quot;
                 </p>
               </div>
             )}

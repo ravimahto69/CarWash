@@ -102,52 +102,60 @@ const ServicesPage = () => {
     return stars;
   };
   return (
-    <div className="px-4 md:px-20 py-16 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen transition-colors">
+    <div className="px-4 md:px-20 py-16 bg-white dark:bg-gray-900 min-h-screen transition-colors">
       {/* Header Section */}
-      <div className="text-center mb-16">
-        <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 mb-4">
-          🧼 Our Car Wash Services
+      <div className="text-center mb-20">
+        <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 dark:from-blue-400 dark:via-purple-400 dark:to-blue-400 mb-6">
+          🧼 Premium Car Wash Services
         </h1>
-        <p className="text-gray-700 dark:text-gray-300 mt-4 max-w-3xl mx-auto text-lg leading-relaxed">
-          Professional car wash packages for all vehicle types. Choose the perfect service for your bike, car, SUV, EV, or truck.
+        <p className="text-gray-600 dark:text-gray-300 mt-4 max-w-3xl mx-auto text-xl leading-relaxed font-medium">
+          Professional detailing for all vehicle types. From quick rinse to deep ceramic treatment.
         </p>
-        <Link 
-          href="/book"
-          className="inline-block mt-8 px-10 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 text-base"
-        >
-          📅 Book Now
-        </Link>
+        <div className="flex gap-4 justify-center mt-10 flex-wrap">
+          <Link 
+            href="/book"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 text-base"
+          >
+            📅 Book Now
+          </Link>
+          <Link 
+            href="/nearby-stores"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 text-base"
+          >
+            📍 Find Nearby
+          </Link>
+        </div>
       </div>
 
       {/* Pricing Cards by Vehicle Type */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
         {Object.entries(PRICING_DATA).map(([vehicleType, packages], idx) => (
           <div 
             key={vehicleType} 
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600"
+            className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:scale-[1.02]"
           >
             {/* Vehicle Type Header */}
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 p-6 text-white">
-              <h2 className="text-2xl font-bold">{vehicleType}</h2>
-              <p className="text-blue-100 text-sm mt-1">Premium cleaning services</p>
+            <div className="bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 dark:from-blue-700 dark:via-blue-800 dark:to-purple-800 p-8 text-white">
+              <h2 className="text-3xl font-bold mb-2">{vehicleType}</h2>
+              <p className="text-blue-100 text-sm">Premium cleaning • Professional care</p>
             </div>
 
             {/* Pricing Options */}
-            <div className="p-6 space-y-4">
+            <div className="p-8 space-y-4">
               {packages.map((pkg, idx) => (
                 <div
                   key={idx}
-                  className={`p-5 rounded-xl border-2 transition-all duration-200 ${
+                  className={`p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:scale-[1.02] ${
                     pkg.popular
-                      ? 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900 dark:to-orange-900 border-amber-300 dark:border-amber-600 ring-2 ring-amber-200 dark:ring-amber-700 shadow-md'
-                      : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500'
+                      ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900 dark:to-orange-900 border-amber-400 dark:border-amber-500 ring-2 ring-amber-300 dark:ring-amber-600 shadow-lg'
+                      : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-600'
                   }`}
                 >
                   {/* Popular Badge */}
                   {pkg.popular && (
-                    <div className="flex items-center gap-1 mb-2 text-amber-600 dark:text-amber-300 text-xs font-bold">
-                      <FireOutlined className="text-sm" />
-                      MOST POPULAR
+                    <div className="flex items-center gap-2 mb-3 text-amber-700 dark:text-amber-200 text-xs font-bold tracking-wider">
+                      <FireOutlined className="text-base animate-pulse" />
+                      MOST POPULAR • HIGHLY RATED
                     </div>
                   )}
 

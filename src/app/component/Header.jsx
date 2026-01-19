@@ -52,9 +52,10 @@ const Header = () => {
   const menus = [
     { label: "Home", href: "/" },
     { label: "Services", href: "/services" },
+    { label: "📍 Find Nearby", href: "/nearby-stores" },
     { label: "Book Now", href: "/book" },
     ...(isLoggedIn 
-      ? [{ label: "My Bookings", href: "/dashboard" }] 
+      ? [] 
       : [{ label: "Login", href: "/login" }]
     ),
   ];

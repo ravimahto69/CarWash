@@ -175,15 +175,24 @@ const AdminDashboard = () => {
   /* ---------------- ADD STORE ---------------- */
   const onAddStore = async (values) => {
     try {
+      // Create location object for GeoJSON format
+      const storeData = {
+        ...values,
+        location: {
+          type: 'Point',
+          coordinates: [values.longitude, values.latitude] // [longitude, latitude] for GeoJSON
+        }
+      }
+      
       const res = await fetch("/api/stores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(storeData),
       })
       const data = await res.json()
 
       if (!res.ok) return message.error(data.error)
-      message.success("Store added")
+      message.success("Store added successfully!")
       storeForm.resetFields()
       loadData()
     } catch {
@@ -348,7 +357,7 @@ const AdminDashboard = () => {
                       />
                     </Form.Item>
 
-                    <Form.Item name="description" label={<span className="text-gray-800 dark:text-white font-bold text-sm">What's Included</span>}>
+                    <Form.Item name="description" label={<span className="text-gray-800 dark:text-white font-bold text-sm">What&apos;s Included</span>}>
                       <Input 
                         placeholder="e.g., Foam wash + chain clean + polish" 
                         className="h-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base border-2 border-blue-300 dark:border-blue-500 rounded-lg shadow-sm hover:border-blue-400 focus:border-blue-500 placeholder-blue-500 dark:placeholder-blue-300"
@@ -528,9 +537,28 @@ const AdminDashboard = () => {
                   <Form.Item name="name" label={<span className="text-gray-800 dark:text-white font-bold text-base">Store Name</span>} required>
                     <Input placeholder="Enter store name" className="h-11 text-base font-semibold bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500 placeholder-gray-500 dark:placeholder-gray-300" />
                   </Form.Item>
+                  
                   <Form.Item name="address" label={<span className="text-gray-800 dark:text-white font-bold text-base">Address</span>} required>
                     <Input placeholder="Enter store address" className="h-11 text-base font-semibold bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500 placeholder-gray-500 dark:placeholder-gray-300" />
                   </Form.Item>
+
+                  <Form.Item name="phone" label={<span className="text-gray-800 dark:text-white font-bold text-base">Phone Number</span>} required>
+                    <Input placeholder="Enter phone number (e.g., +91 9876543210)" className="h-11 text-base font-semibold bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500 placeholder-gray-500 dark:placeholder-gray-300" />
+                  </Form.Item>
+
+                  <Row gutter={16}>
+                    <Col xs={24} sm={12}>
+                      <Form.Item name="latitude" label={<span className="text-gray-800 dark:text-white font-bold text-base">Latitude</span>} required>
+                        <InputNumber placeholder="e.g., 40.7128" step={0.0001} className="h-11 w-full text-base font-semibold bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500" />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} sm={12}>
+                      <Form.Item name="longitude" label={<span className="text-gray-800 dark:text-white font-bold text-base">Longitude</span>} required>
+                        <InputNumber placeholder="e.g., -74.0060" step={0.0001} className="h-11 w-full text-base font-semibold bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white border-gray-300 dark:border-gray-500" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
                   <Button type="primary" htmlType="submit" block className="h-10 font-semibold text-base" icon={<PlusOutlined />}>
                     Save Store
                   </Button>
@@ -549,9 +577,13 @@ const AdminDashboard = () => {
                     <List.Item className="py-4 px-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-500 transition-colors duration-200">
                       <div className="w-full">
                         <div className="flex justify-between items-start">
-                          <div>
+                          <div className="flex-1">
                             <p className="font-semibold text-lg dark:text-white">{item.name}</p>
                             <p className="text-gray-600 dark:text-gray-400 mt-1">📍 {item.address}</p>
+                            {item.phone && <p className="text-gray-600 dark:text-gray-400 mt-1">📞 {item.phone}</p>}
+                            {item.latitude && item.longitude && (
+                              <p className="text-gray-600 dark:text-gray-400 mt-1">🧭 {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}</p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -612,7 +644,7 @@ const AdminDashboard = () => {
                 />
               </Form.Item>
 
-              <Form.Item name="description" label={<span className="text-gray-800 dark:text-white font-bold text-sm">What's Included</span>}>
+              <Form.Item name="description" label={<span className="text-gray-800 dark:text-white font-bold text-sm">What&apos;s Included</span>}>
                 <Input 
                   placeholder="e.g., Foam wash + chain clean + polish" 
                   className="h-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base border-2 border-blue-300 dark:border-blue-500 rounded-lg shadow-sm hover:border-blue-400 focus:border-blue-500 placeholder-blue-500 dark:placeholder-blue-300"

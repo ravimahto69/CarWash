@@ -314,7 +314,7 @@ const UserDashboard = () => {
                 <div className="mt-4 pt-4 border-t-2 border-gray-200 dark:border-gray-600">
                   <p className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">📝 Notes:</p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg italic">
-                    "{booking.notes}"
+                    &quot;{booking.notes}&quot;
                   </p>
                 </div>
               )}

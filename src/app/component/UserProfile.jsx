@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Input, Button, message, Spin, Tabs, Modal, Form } from 'antd';
 import { UserOutlined, HomeOutlined, CreditCardOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 
@@ -44,11 +44,7 @@ const UserProfile = ({ userEmail }) => {
     isDefault: false,
   });
 
-  useEffect(() => {
-    loadUserProfile();
-  }, [userEmail]);
-
-  const loadUserProfile = async () => {
+  const loadUserProfile = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/user/profile?email=${userEmail}`);
@@ -67,7 +63,11 @@ const UserProfile = ({ userEmail }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userEmail]);
+
+  useEffect(() => {
+    loadUserProfile();
+  }, [loadUserProfile]);
 
   const handleProfileUpdate = async () => {
     try {
@@ -578,7 +578,6 @@ const UserProfile = ({ userEmail }) => {
             backgroundColor: 'transparent',
             borderBottom: '2px solid #e5e7eb',
           }}
-          className="dark:[--text-color:#fff] dark:[--border-color:#374151]"
         />
 
         {/* Address Modal */}
