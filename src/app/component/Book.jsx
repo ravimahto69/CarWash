@@ -1,43 +1,67 @@
-'use client'
+"use client";
 import React, { useMemo, useState } from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 // Static pricing data structure - all vehicles and wash types
 const PRICING_DATA = {
-  'Bike / Scooter': [
-    { type: 'Basic Wash', description: 'Water rinse + shampoo', price: 149 },
-    { type: 'Foam Wash', description: 'Foam + pressure wash + dry', price: 199 },
-    { type: 'Premium Care', description: 'Foam wash + chain clean + polish', price: 299 },
+  "Bike / Scooter": [
+    { type: "Basic Wash", description: "Water rinse + shampoo", price: 149 },
+    {
+      type: "Foam Wash",
+      description: "Foam + pressure wash + dry",
+      price: 199,
+    },
+    {
+      type: "Premium Care",
+      description: "Foam wash + chain clean + polish",
+      price: 299,
+    },
   ],
-  'Hatchback': [
-    { type: 'Basic Wash', description: 'Exterior wash & dry', price: 399 },
-    { type: 'Foam Wash', description: 'Foam wash + tyre clean', price: 499 },
-    { type: 'Interior + Exterior', description: 'Foam wash + vacuum + dashboard', price: 699 },
+  Hatchback: [
+    { type: "Basic Wash", description: "Exterior wash & dry", price: 399 },
+    { type: "Foam Wash", description: "Foam wash + tyre clean", price: 499 },
+    {
+      type: "Interior + Exterior",
+      description: "Foam wash + vacuum + dashboard",
+      price: 699,
+    },
   ],
-  'Sedan': [
-    { type: 'Basic Wash', description: 'Exterior wash', price: 449 },
-    { type: 'Foam Wash', description: 'Foam + tyre & rim clean', price: 599 },
-    { type: 'Full Cleaning', description: 'Foam + interior vacuum + polish', price: 899 },
+  Sedan: [
+    { type: "Basic Wash", description: "Exterior wash", price: 449 },
+    { type: "Foam Wash", description: "Foam + tyre & rim clean", price: 599 },
+    {
+      type: "Full Cleaning",
+      description: "Foam + interior vacuum + polish",
+      price: 899,
+    },
   ],
-  'SUV': [
-    { type: 'Basic Wash', description: 'Exterior wash', price: 599 },
-    { type: 'Foam Wash', description: 'Foam wash + tyre cleaning', price: 799 },
-    { type: 'Deep Clean', description: 'Exterior + interior + mats', price: 999 },
+  SUV: [
+    { type: "Basic Wash", description: "Exterior wash", price: 599 },
+    { type: "Foam Wash", description: "Foam wash + tyre cleaning", price: 799 },
+    {
+      type: "Deep Clean",
+      description: "Exterior + interior + mats",
+      price: 999,
+    },
   ],
-  'Electric (EV)': [
-    { type: 'Safe Wash', description: 'Low-water exterior wash', price: 499 },
-    { type: 'Foam Wash', description: 'EV-safe foam + tyre clean', price: 699 },
-    { type: 'Premium EV Care', description: 'Foam + interior vacuum', price: 899 },
+  "Electric (EV)": [
+    { type: "Safe Wash", description: "Low-water exterior wash", price: 499 },
+    { type: "Foam Wash", description: "EV-safe foam + tyre clean", price: 699 },
+    {
+      type: "Premium EV Care",
+      description: "Foam + interior vacuum",
+      price: 899,
+    },
   ],
-  'Pickup / Van': [
-    { type: 'Basic Wash', description: 'Exterior wash', price: 699 },
-    { type: 'Foam Wash', description: 'Foam + tyre cleaning', price: 899 },
-    { type: 'Full Service', description: 'Exterior + interior', price: 1199 },
+  "Pickup / Van": [
+    { type: "Basic Wash", description: "Exterior wash", price: 699 },
+    { type: "Foam Wash", description: "Foam + tyre cleaning", price: 899 },
+    { type: "Full Service", description: "Exterior + interior", price: 1199 },
   ],
-  'Truck': [
-    { type: 'Basic Wash', description: 'Exterior water wash', price: 999 },
-    { type: 'Foam Wash', description: 'Foam + pressure wash', price: 1299 },
-    { type: 'Premium Clean', description: 'Full body + cabin', price: 1599 },
+  Truck: [
+    { type: "Basic Wash", description: "Exterior water wash", price: 999 },
+    { type: "Foam Wash", description: "Foam + pressure wash", price: 1299 },
+    { type: "Premium Clean", description: "Full body + cabin", price: 1599 },
   ],
 };
 
@@ -45,7 +69,7 @@ const vehicleTypes = Object.keys(PRICING_DATA);
 
 const BookingPage = () => {
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -73,7 +97,7 @@ const BookingPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));    
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleServiceChange = (e) => {
@@ -86,48 +110,53 @@ const BookingPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/booking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+      // Extract amount from selected service
+      const servicePrice = selectedPrice || formData.service.match(/\d+/)?.[0] || 0;
+      
+      const res = await fetch("/api/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, amount: servicePrice }),
       });
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        const msg = data?.error || 'Failed to submit booking';
+        const msg = data?.error || "Failed to submit booking";
         alert(msg);
         return;
       }
 
-      // Extract amount from selected service
-      const servicePrice = selectedPrice || formData.service.match(/\d+/)?.[0] || 600;
       const bookingId = data.data?.id || data.data?._id;
 
       // Redirect to payment page
-      router.push(`/payment?bookingId=${bookingId}&amount=${servicePrice}&service=${encodeURIComponent(formData.service)}`);
-      
+      router.push(
+        `/payment?bookingId=${bookingId}&amount=${servicePrice}&service=${encodeURIComponent(formData.service)}`,
+      );
+
       setFormData({
-        name: '',
-        phone: '',
-        email: '',
-        brand: '',
-        model: '',
-        vehicleType: '',
-        service: '',
-        date: '',
-        time: '',
-        location: '',
-        notes: '',
+        name: "",
+        phone: "",
+        email: "",
+        brand: "",
+        model: "",
+        vehicleType: "",
+        service: "",
+        date: "",
+        time: "",
+        location: "",
+        notes: "",
       });
     } catch (error) {
-      console.error('Booking submit error:', error);
-      alert('An unexpected error occurred. Please try again.');
+      console.error("Booking submit error:", error);
+      alert("An unexpected error occurred. Please try again.");
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 text-black dark:text-white bg-white dark:bg-gray-900 min-h-screen transition-colors">
-      <h1 className="text-3xl font-bold mb-6 text-black dark:text-white">Book a Service</h1>
+      <h1 className="text-3xl font-bold mb-6 text-black dark:text-white">
+        Book a Service
+      </h1>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Personal Details */}
@@ -233,14 +262,25 @@ const BookingPage = () => {
           {/* Category-specific recommendations */}
           {formData.vehicleType && filteredServices.length > 0 && (
             <div className="mt-6">
-              <p className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4">Recommended Packages for {formData.vehicleType}</p>
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4">
+                Recommended Packages for {formData.vehicleType}
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {filteredServices.map((svc) => (
-                  <div key={svc.type} className="p-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 hover:shadow-md transition-shadow">
+                  <div
+                    key={svc.type}
+                    className="p-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 hover:shadow-md transition-shadow"
+                  >
                     <div>
-                      <p className="font-bold text-lg text-black dark:text-white">{svc.type}</p>
-                      <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">{svc.description}</p>
-                      <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-4">₹{svc.price}</p>
+                      <p className="font-bold text-lg text-black dark:text-white">
+                        {svc.type}
+                      </p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                        {svc.description}
+                      </p>
+                      <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-4">
+                        ₹{svc.price}
+                      </p>
                     </div>
                     <button
                       type="button"
@@ -256,7 +296,9 @@ const BookingPage = () => {
           )}
 
           {!formData.vehicleType && (
-            <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">Please select a vehicle type to see available packages.</p>
+            <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+              Please select a vehicle type to see available packages.
+            </p>
           )}
         </section>
 

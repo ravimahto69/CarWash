@@ -1,5 +1,5 @@
-import Payment from '../../models/Payment';
-import { connectDB } from '../../lib/db';
+import Payment from '@/app/models/Payment';
+import dbConnection from '@/app/lib/db';
 import Razorpay from 'razorpay';
 
 const razorpay = new Razorpay({
@@ -9,7 +9,7 @@ const razorpay = new Razorpay({
 
 export async function POST(req) {
   try {
-    await connectDB();
+    await dbConnection();
 
     const { amount, bookingId, userId, customerName, customerEmail, customerPhone, serviceType } = req.body;
 

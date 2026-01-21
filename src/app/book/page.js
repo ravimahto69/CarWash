@@ -1,29 +1,12 @@
-'use client';
+import React from 'react';
+import BookPageClient from './BookPageClient';
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Book from '../component/Book';
+export const metadata = {
+  title: "WashHub | Book"
+};
 
 const Page = () => {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Check if user is logged in
-    try {
-      const authUser = localStorage.getItem('auth_user');
-      if (!authUser) {
-        router.push('/login');
-      }
-    } catch (_) {
-      router.push('/login');
-    }
-  }, [router]);
-
-  return (
-    <div>
-      <Book />
-    </div>
-  );
+  return <BookPageClient />;
 };
 
 export default Page;

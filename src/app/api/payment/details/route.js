@@ -1,9 +1,9 @@
-import Payment from '../../models/Payment';
-import { connectDB } from '../../lib/db';
+import Payment from '@/app/models/Payment';
+import dbConnection from '@/app/lib/db';
 
 export async function GET(req) {
   try {
-    await connectDB();
+    await dbConnection();
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');

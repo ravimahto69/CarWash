@@ -1,6 +1,5 @@
-/* Print Styles - Only show booking details */
+
 @media print {
-  /* Hide everything by default */
   body * {
     visibility: hidden;
   }

@@ -1,11 +1,11 @@
-import Payment from '../../models/Payment';
-import Booking from '../../models/Booking';
-import { connectDB } from '../../lib/db';
+import Payment from '@/app/models/Payment';
+import Booking from '@/app/models/Booking';
+import dbConnection from '@/app/lib/db';
 import crypto from 'crypto';
 
 export async function POST(req) {
   try {
-    await connectDB();
+    await dbConnection();
 
     const { razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
 
@@ -63,6 +63,7 @@ export async function POST(req) {
       await Booking.findByIdAndUpdate(
         payment.bookingId,
         {
+          amount: payment.amount,
           paymentStatus: 'completed',
           bookingStatus: 'confirmed',
           isPaid: true,

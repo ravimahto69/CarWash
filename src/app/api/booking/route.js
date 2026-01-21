@@ -58,6 +58,7 @@ export async function POST(req) {
 			model: body.model,
 			vehicleType: body.vehicleType,
 			service: body.service,
+			amount: body.amount || 0,
 			location: body.location || '',
 			notes: body.notes || '',
 		})

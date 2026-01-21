@@ -1,6 +1,8 @@
 
 import React from 'react'
 import Login from '@/app/component/Login'
+export const metadata ={
+  title : "WashHub | Login"}
 
 const login = () => {
   return (
