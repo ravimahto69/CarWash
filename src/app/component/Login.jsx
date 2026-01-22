@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button, Form, Input, Typography, message, Checkbox, Divider } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined, FacebookOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 const { Title, Text } = Typography;
 
@@ -11,37 +12,54 @@ export default function LoginForm() {
   const [form] = Form.useForm();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState({ google: false, facebook: false });
+
+  const handleOAuthSignIn = async (provider) => {
+    setOauthLoading({ ...oauthLoading, [provider]: true });
+    try {
+      // Let next-auth handle the full redirect flow for OAuth providers
+      await signIn(provider, {
+        callbackUrl: '/',
+        redirect: true,
+      });
+    } catch (error) {
+      message.error('An error occurred during login');
+      setOauthLoading({ ...oauthLoading, [provider]: false });
+    }
+  };
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: values.email,
+        password: values.password,
       });
 
-      const data = await res.json();
-
-      if (!res.ok || !data?.success) {
-        const errorMsg = data?.error || 'Invalid email or password';
-        message.error(errorMsg);
+      if (result?.error) {
+        message.error('Invalid email or password');
         return;
       }
 
-      // Save user data to localStorage
-      try {
-        localStorage.setItem('auth_user', JSON.stringify(data.data));
-        if (values.remember) {
-          localStorage.setItem('remember_me', 'true');
-        }
-        // Dispatch custom event to notify Header component
-        window.dispatchEvent(new Event('user-login'));
-      } catch (_) {}
+      if (result?.ok) {
+        // Save user data to localStorage for compatibility
+        try {
+          const userData = {
+            email: values.email,
+            name: values.email.split('@')[0],
+          };
+          localStorage.setItem('auth_user', JSON.stringify(userData));
+          if (values.remember) {
+            localStorage.setItem('remember_me', 'true');
+          }
+          window.dispatchEvent(new Event('user-login'));
+        } catch (_) {}
 
-      message.success('Login successful! Redirecting...');
-      form.resetFields();
-      setTimeout(() => router.push('/'), 1000);
+        message.success('Login successful! Redirecting...');
+        form.resetFields();
+        setTimeout(() => router.push('/'), 1000);
+      }
     } catch (err) {
       console.error('Login submit error:', err);
       message.error('Something went wrong. Please try again.');
@@ -136,7 +154,9 @@ export default function LoginForm() {
           block
           icon={<GoogleOutlined />}
           className="flex items-center justify-center hover:border-red-400 transition-colors"
-          onClick={() => message.info('Google login coming soon!')}
+          onClick={() => handleOAuthSignIn('google')}
+          loading={oauthLoading.google}
+          disabled={loading || oauthLoading.facebook}
         >
           Google
         </Button>
@@ -145,14 +165,16 @@ export default function LoginForm() {
           block
           icon={<FacebookOutlined />}
           className="flex items-center justify-center hover:border-blue-400 transition-colors"
-          onClick={() => message.info('Facebook login coming soon!')}
+          onClick={() => handleOAuthSignIn('facebook')}
+          loading={oauthLoading.facebook}
+          disabled={loading || oauthLoading.google}
         >
           Facebook
         </Button>
       </div>
 
       <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-        Don't have an account?
+        Don&apos;t have an account?
         <a href="/register" className="ml-1 font-medium text-blue-600 dark:text-blue-400 hover:underline transition-colors">
           Register now
         </a>

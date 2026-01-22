@@ -12,10 +12,12 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@auth/mongodb-adapter": "^3.11.1",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.4",
     "next": "14.2.35",
+    "next-auth": "^4.24.13",
     "razorpay": "^2.9.6",
     "react": "^18",
     "react-dom": "^18"

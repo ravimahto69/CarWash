@@ -6,6 +6,7 @@ import Layout from "antd/es/layout/layout";
 import Header from "./component/Header";
 import Footer from "./component/Footer";
 import { ThemeProvider } from "./context/ThemeContext";
+import NextAuthProvider from "./component/NextAuthProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,17 +29,19 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900 transition-colors`}>
-        <ThemeProvider>
-          <header>
-            <Header />
-          </header>
-          <Layout className="bg-white dark:bg-gray-900 transition-colors">
-            {children}
-          </Layout>
-          <footer>
-            <Footer />
-          </footer>
-        </ThemeProvider>
+        <NextAuthProvider>
+          <ThemeProvider>
+            <header>
+              <Header />
+            </header>
+            <Layout className="bg-white dark:bg-gray-900 transition-colors">
+              {children}
+            </Layout>
+            <footer>
+              <Footer />
+            </footer>
+          </ThemeProvider>
+        </NextAuthProvider>
       </body>
     </html>
   );

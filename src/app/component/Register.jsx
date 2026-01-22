@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button, Form, Input, Typography, message, Progress, Checkbox, Divider } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined, GoogleOutlined, FacebookOutlined, PhoneOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 const { Title, Text } = Typography;
 
@@ -12,6 +13,28 @@ export default function RegisterForm({children}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [oauthLoading, setOauthLoading] = useState({ google: false, facebook: false });
+
+  const handleOAuthSignUp = async (provider) => {
+    setOauthLoading({ ...oauthLoading, [provider]: true });
+    try {
+      const result = await signIn(provider, {
+        callbackUrl: '/',
+        redirect: false,
+      });
+
+      if (result?.error) {
+        message.error(`${provider} signup failed. Please try again.`);
+      } else if (result?.ok) {
+        message.success(`${provider} signup successful! Redirecting...`);
+        setTimeout(() => router.push('/'), 1000);
+      }
+    } catch (error) {
+      message.error('An error occurred during signup');
+    } finally {
+      setOauthLoading({ ...oauthLoading, [provider]: false });
+    }
+  };
 
   const calculatePasswordStrength = (password) => {
     if (!password) return 0;
@@ -242,7 +265,9 @@ export default function RegisterForm({children}) {
           block
           icon={<GoogleOutlined />}
           className="flex items-center justify-center hover:border-red-400 transition-colors"
-          onClick={() => message.info('Google signup coming soon!')}
+          onClick={() => handleOAuthSignUp('google')}
+          loading={oauthLoading.google}
+          disabled={loading || oauthLoading.facebook}
         >
           Google
         </Button>
@@ -251,7 +276,9 @@ export default function RegisterForm({children}) {
           block
           icon={<FacebookOutlined />}
           className="flex items-center justify-center hover:border-blue-400 transition-colors"
-          onClick={() => message.info('Facebook signup coming soon!')}
+          onClick={() => handleOAuthSignUp('facebook')}
+          loading={oauthLoading.facebook}
+          disabled={loading || oauthLoading.google}
         >
           Facebook
         </Button>
