@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import {
   Card,
   Form,
@@ -60,7 +61,21 @@ const AdminDashboard = () => {
   /* ---------------- AUTH CHECK ---------------- */
   useEffect(() => {
     const authUser = localStorage.getItem("auth_user");
-    if (!authUser) router.push("/login");
+    if (!authUser) {
+      router.push("/login");
+      return;
+    }
+    
+    try {
+      const user = JSON.parse(authUser);
+      if (user.role !== "admin") {
+        message.error("Unauthorized: Admin access required");
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      console.error("Invalid auth_user data:", err);
+      router.push("/login");
+    }
   }, [router]);
 
   /* ---------------- LOAD DATA ---------------- */
@@ -219,9 +234,23 @@ const AdminDashboard = () => {
   ];
 
   /* ---------------- LOGOUT ---------------- */
-  const logout = () => {
-    localStorage.removeItem("auth_user");
-    router.push("/login");
+  const logout = async () => {
+    try {
+      localStorage.removeItem("auth_user");
+      localStorage.removeItem("remember_me");
+      window.dispatchEvent(new Event("user-logout"));
+      
+      // Sign out from NextAuth
+      await signOut({ 
+        callbackUrl: "/login",
+        redirect: true 
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      message.error("Logout failed");
+      // Fallback redirect
+      router.push("/login");
+    }
   };
 
   return (

@@ -1,28 +1,62 @@
   'use client';
 
-import { useState } from 'react';
-import { Button, Form, Input, Typography, message, Checkbox, Divider } from 'antd';
+import { useState, useEffect } from 'react';
+import { Button, Form, Input, Typography, message, Checkbox, Divider, Spin } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined, FacebookOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 
 const { Title, Text } = Typography;
 
 export default function LoginForm() {
   const [form] = Form.useForm();
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState({ google: false, facebook: false });
+  const [isChecking, setIsChecking] = useState(true);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      // Save user data to localStorage
+      try {
+        localStorage.setItem('auth_user', JSON.stringify(session.user));
+      } catch (_) {}
+      
+      // Redirect to dashboard or home
+      const redirectTo = session.user.role === 'admin' ? '/admin' : '/dashboard';
+      router.push(redirectTo);
+    }
+    setIsChecking(false);
+  }, [status, session, router]);
 
   const handleOAuthSignIn = async (provider) => {
     setOauthLoading({ ...oauthLoading, [provider]: true });
     try {
-      // Let next-auth handle the full redirect flow for OAuth providers
-      await signIn(provider, {
+      const result = await signIn(provider, {
         callbackUrl: '/',
-        redirect: true,
+        redirect: false,
       });
+      
+      if (result?.error) {
+        message.error('OAuth login failed: ' + result.error);
+        setOauthLoading({ ...oauthLoading, [provider]: false });
+      } else if (result?.ok) {
+        // Get the session and redirect
+        setTimeout(async () => {
+          const sessionRes = await fetch('/api/auth/session');
+          const sessionData = await sessionRes.json();
+          
+          if (sessionData?.user) {
+            localStorage.setItem('auth_user', JSON.stringify(sessionData.user));
+            const redirectTo = sessionData.user.role === 'admin' ? '/admin' : '/dashboard';
+            router.push(redirectTo);
+          }
+        }, 500);
+      }
     } catch (error) {
+      console.error('OAuth error:', error);
       message.error('An error occurred during login');
       setOauthLoading({ ...oauthLoading, [provider]: false });
     }
@@ -45,20 +79,33 @@ export default function LoginForm() {
       if (result?.ok) {
         // Save user data to localStorage for compatibility
         try {
-          const userData = {
+          // Fetch full user data from session or API
+          const sessionRes = await fetch('/api/auth/session');
+          const sessionData = await sessionRes.json();
+          
+          const userData = sessionData?.user || {
             email: values.email,
             name: values.email.split('@')[0],
+            role: 'user',
           };
+          
           localStorage.setItem('auth_user', JSON.stringify(userData));
           if (values.remember) {
             localStorage.setItem('remember_me', 'true');
           }
           window.dispatchEvent(new Event('user-login'));
-        } catch (_) {}
-
-        message.success('Login successful! Redirecting...');
-        form.resetFields();
-        setTimeout(() => router.push('/'), 1000);
+          
+          message.success('Login successful! Redirecting...');
+          form.resetFields();
+          
+          // Redirect based on role
+          const redirectTo = userData.role === 'admin' ? '/admin' : '/dashboard';
+          setTimeout(() => router.push(redirectTo), 500);
+        } catch (err) {
+          console.error('Session fetch error:', err);
+          message.success('Login successful! Redirecting...');
+          setTimeout(() => router.push('/dashboard'), 500);
+        }
       }
     } catch (err) {
       console.error('Login submit error:', err);
@@ -69,7 +116,13 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-800 p-8 shadow-2xl items-center transition-all duration-300 hover:shadow-3xl animate-fadeIn">
+    <>
+      {isChecking ? (
+        <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-800 p-8 shadow-2xl flex items-center justify-center" style={{ minHeight: '300px' }}>
+          <Spin size="large" tip="Checking session..." />
+        </div>
+      ) : (
+        <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-800 p-8 shadow-2xl items-center transition-all duration-300 hover:shadow-3xl animate-fadeIn">
       <div className="text-center mb-8">
         <div className="inline-block p-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 mb-4">
           <UserOutlined className="text-3xl text-white" />
@@ -179,6 +232,8 @@ export default function LoginForm() {
           Register now
         </a>
       </p>
-    </div>
+        </div>
+      )}
+    </>
   );
 }

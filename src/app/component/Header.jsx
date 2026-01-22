@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Dropdown } from "antd";
+import { signOut } from "next-auth/react";
 import { useTheme } from "../context/ThemeContext";
 import { SunOutlined, MoonOutlined } from "@ant-design/icons";
 
@@ -41,11 +42,13 @@ const Header = () => {
     checkAuth();
     // Listen for storage changes (for multi-tab sync)
     window.addEventListener('storage', checkAuth);
-    // Listen for custom login event (for same-tab updates)
+    // Listen for custom login/logout events
     window.addEventListener('user-login', checkAuth);
+    window.addEventListener('user-logout', checkAuth);
     return () => {
       window.removeEventListener('storage', checkAuth);
       window.removeEventListener('user-login', checkAuth);
+      window.removeEventListener('user-logout', checkAuth);
     };
   }, []);
 
@@ -60,13 +63,26 @@ const Header = () => {
     ),
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     try {
       localStorage.removeItem('auth_user');
+      localStorage.removeItem('remember_me');
       setIsLoggedIn(false);
       setOpen(false);
+      
+      // Dispatch logout event for other components
+      window.dispatchEvent(new Event('user-logout'));
+      
+      // Sign out from NextAuth
+      await signOut({ 
+        callbackUrl: "/login",
+        redirect: true 
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Fallback
       router.push('/login');
-    } catch (_) {}
+    }
   };
 
   return (

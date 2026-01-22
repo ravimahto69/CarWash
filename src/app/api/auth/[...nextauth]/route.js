@@ -2,19 +2,16 @@ import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { MongoDBAdapter } from '@auth/mongodb-adapter';
-import clientPromise from '@/app/lib/mongodb-client';
 import dbConnection from '@/app/lib/db';
 import User from '@/app/models/User';
 import bcryptjs from 'bcryptjs';
 
 export const authOptions = {
-  adapter: MongoDBAdapter(clientPromise),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      allowDangerousEmailAccountLinking: true,
+      allowDangerousEmailAccountLinking: false,
       authorization: {
         params: {
           prompt: "consent",
@@ -26,7 +23,7 @@ export const authOptions = {
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      allowDangerousEmailAccountLinking: true,
+      allowDangerousEmailAccountLinking: false,
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -70,21 +67,26 @@ export const authOptions = {
         try {
           await dbConnection();
           
-          // Check if user exists
-          let existingUser = await User.findOne({ email: user.email.toLowerCase() });
+          // Find or create user with unique provider ID
+          let existingUser = await User.findOne({ 
+            $or: [
+              { authProviderId: account.providerAccountId },
+              { email: user.email.toLowerCase() }
+            ]
+          });
           
           if (!existingUser) {
-            // Create new user for OAuth
+            // Create completely new user
             existingUser = await User.create({
-              name: user.name,
+              name: user.name || 'User',
               email: user.email.toLowerCase(),
-              password: await bcryptjs.hash(Math.random().toString(36), 10), // Random password
+              password: await bcryptjs.hash(Math.random().toString(36).slice(2), 10),
               role: 'user',
               authProvider: account.provider,
               authProviderId: account.providerAccountId,
             });
-          } else if (!existingUser.authProvider) {
-            // Update existing user with OAuth info
+          } else if (!existingUser.authProviderId || existingUser.authProviderId !== account.providerAccountId) {
+            // Update existing user with new provider info
             existingUser.authProvider = account.provider;
             existingUser.authProviderId = account.providerAccountId;
             await existingUser.save();
@@ -92,10 +94,12 @@ export const authOptions = {
           
           user.id = existingUser._id.toString();
           user.role = existingUser.role;
+          user.email = existingUser.email;
+          user.name = existingUser.name;
           
           return true;
         } catch (error) {
-          console.error('Sign in error:', error);
+          console.error('OAuth Sign in error:', error);
           return false;
         }
       }
