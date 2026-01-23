@@ -112,7 +112,6 @@ const Header = () => {
           {mounted && (
             <button
               onClick={() => {
-                console.log('Theme toggle clicked, current isDark:', isDark);
                 toggleTheme();
               }}
               className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
@@ -173,7 +172,6 @@ const Header = () => {
           {mounted && (
             <button
               onClick={() => {
-                console.log('Mobile theme toggle clicked, current isDark:', isDark);
                 toggleTheme();
               }}
               className="text-gray-700 dark:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"

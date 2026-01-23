@@ -28,9 +28,7 @@ export default function BookingConfirmation() {
     const fetchData = async () => {
       try {
         // Fetch booking details
-        console.log('Fetching booking with ID:', bookingId);
         const bookingRes = await fetch(`/api/booking?id=${bookingId}`);
-        console.log('Booking response status:', bookingRes.status);
         
         if (!bookingRes.ok) {
           console.error('Booking fetch failed:', bookingRes.status);

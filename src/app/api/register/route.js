@@ -6,7 +6,6 @@ import bcryptjs from 'bcryptjs'
 export async function POST(req) {
   try {
     const body = await req.json()
-    console.log('Incoming register payload:', { name: body.name, email: body.email })
 
     // Validate required fields
     const required = ['name', 'email', 'password', 'confirmPassword']
@@ -35,11 +34,9 @@ export async function POST(req) {
     }
 
     await dbConnection()
-    console.log('✅ Register route connected to database')
 
     // Check if user already exists
     const existingUser = await User.findOne({ email: body.email.toLowerCase() })
-    console.log('Existing user check:', existingUser ? 'Email already exists' : 'Email available')
     
     if (existingUser) {
       return NextResponse.json(
@@ -50,7 +47,6 @@ export async function POST(req) {
 
     // Hash the password
     const hashedPassword = await bcryptjs.hash(body.password, 10)
-    console.log('✅ Password hashed successfully')
 
     // Create the user
     const user = await User.create({
@@ -61,9 +57,6 @@ export async function POST(req) {
       authProvider: null,
       authProviderId: null,
     })
-
-    console.log('✅ User registered successfully:', user._id)
-    console.log('User details:', { email: user.email, name: user.name, role: user.role })
 
     return NextResponse.json(
       {
