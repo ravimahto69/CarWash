@@ -12,7 +12,9 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.1.0",
     "@auth/mongodb-adapter": "^3.11.1",
+    "antd": "^6.2.1",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.4",

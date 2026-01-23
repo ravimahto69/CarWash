@@ -18,6 +18,11 @@ export async function dbConnection() {
     if (!cached.promise) {
         cached.promise = mongoose.connect(MONGO_URL, {
             bufferCommands: false,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+        }).catch(err => {
+            console.error('MongoDB connection error:', err)
+            throw err
         })
     }
 
